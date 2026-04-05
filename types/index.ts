@@ -1,4 +1,5 @@
 export type Signal = {
+  id?: number;
   asset: string;
   direction: 'LONG' | 'SHORT';
   confidence: number;

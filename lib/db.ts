@@ -186,4 +186,119 @@ export function insertSignal(signal: {
   );
 }
 
+// ─── API Keys ─────────────────────────────────────────────────────────────────
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS api_keys (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    key_hash TEXT UNIQUE NOT NULL,
+    created_at TEXT DEFAULT (datetime('now'))
+  );
+`);
+
+export interface ApiKey {
+  id: number;
+  user_id: number;
+  key_hash: string;
+  created_at: string;
+}
+
+export function getApiKey(userId: number): ApiKey | undefined {
+  return db
+    .prepare('SELECT * FROM api_keys WHERE user_id = ? ORDER BY created_at DESC LIMIT 1')
+    .get(userId) as ApiKey | undefined;
+}
+
+export function createApiKey(userId: number): string {
+  const { randomBytes, createHash } = require('crypto') as typeof import('crypto');
+  const plainKey = randomBytes(32).toString('hex');
+  const keyHash = createHash('sha256').update(plainKey).digest('hex');
+
+  // Remove any existing key for this user
+  db.prepare('DELETE FROM api_keys WHERE user_id = ?').run(userId);
+
+  db.prepare('INSERT INTO api_keys (user_id, key_hash) VALUES (?, ?)').run(userId, keyHash);
+
+  return plainKey;
+}
+
+export function getUserByApiKey(keyHash: string): (User & { plan: string; status: string }) | undefined {
+  return db.prepare(`
+    SELECT u.*, COALESCE(s.plan, 'basic') AS plan, COALESCE(s.status, 'inactive') AS status
+    FROM api_keys ak
+    JOIN users u ON u.id = ak.user_id
+    LEFT JOIN subscriptions s ON s.user_id = u.id
+    WHERE ak.key_hash = ?
+    LIMIT 1
+  `).get(keyHash) as (User & { plan: string; status: string }) | undefined;
+}
+
+// ─── Admin stats ──────────────────────────────────────────────────────────────
+
+export interface AdminStats {
+  total_users: number;
+  active_subscribers: number;
+  mrr: number;
+  signals_today: number;
+  signals_by_asset: { asset: string; count: number }[];
+  recent_users: { id: number; email: string; plan: string; status: string; created_at: string }[];
+  recent_signals: Signal[];
+}
+
+export function getAdminStats(): AdminStats {
+  const total_users = (db.prepare('SELECT COUNT(*) AS cnt FROM users').get() as { cnt: number }).cnt;
+
+  const active_rows = db.prepare(`
+    SELECT plan, COUNT(*) AS cnt
+    FROM subscriptions
+    WHERE status = 'active'
+    GROUP BY plan
+  `).all() as { plan: string; cnt: number }[];
+
+  let active_subscribers = 0;
+  let mrr = 0;
+  const PLAN_PRICE: Record<string, number> = { basic: 19, pro: 39, api: 99 };
+  for (const row of active_rows) {
+    active_subscribers += row.cnt;
+    mrr += row.cnt * (PLAN_PRICE[row.plan] ?? 0);
+  }
+
+  const signals_today = (db.prepare(`
+    SELECT COUNT(*) AS cnt FROM signals_cache
+    WHERE generated_at >= datetime('now', 'start of day')
+  `).get() as { cnt: number }).cnt;
+
+  const signals_by_asset = db.prepare(`
+    SELECT asset, COUNT(*) AS count
+    FROM signals_cache
+    GROUP BY asset
+    ORDER BY count DESC
+  `).all() as { asset: string; count: number }[];
+
+  const recent_users = db.prepare(`
+    SELECT u.id, u.email, COALESCE(s.plan, 'none') AS plan, COALESCE(s.status, 'none') AS status, u.created_at
+    FROM users u
+    LEFT JOIN subscriptions s ON s.user_id = u.id
+    ORDER BY u.created_at DESC
+    LIMIT 20
+  `).all() as { id: number; email: string; plan: string; status: string; created_at: string }[];
+
+  const recent_signals = db.prepare(`
+    SELECT * FROM signals_cache
+    ORDER BY generated_at DESC
+    LIMIT 25
+  `).all() as Signal[];
+
+  return {
+    total_users,
+    active_subscribers,
+    mrr,
+    signals_today,
+    signals_by_asset,
+    recent_users,
+    recent_signals,
+  };
+}
+
 export default db;

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="x-apple-disable-message-reformatting" />
+  <title>Polymarket Signals — Daily Digest {{DATE}}</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style>
+    /* Reset */
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; display: block; }
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0 !important;
+      padding: 0 !important;
+      background-color: #080e1a;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    }
+
+    /* Responsive */
+    @media screen and (max-width: 600px) {
+      .email-wrapper { width: 100% !important; }
+      .content-block { padding: 24px 16px !important; }
+      .signal-table td { padding: 10px 8px !important; font-size: 13px !important; }
+      .price-col { display: none !important; }
+      .hero-title { font-size: 22px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#080e1a;">
+
+<!-- Preheader text (hidden, shows in email preview) -->
+<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">
+  {{PREHEADER_TEXT}} — {{SIGNALS_COUNT}} signals for {{DATE}}. BTC, ETH, SOL, XRP, DOGE. Not financial advice.
+  &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
+</div>
+
+<!-- Outer wrapper -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#080e1a;">
+  <tr>
+    <td align="center" style="padding:32px 16px;">
+
+      <!-- Email card -->
+      <table class="email-wrapper" role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"
+        style="max-width:600px;width:100%;background-color:#0f172a;border-radius:16px;border:1px solid #1e293b;overflow:hidden;">
+
+        <!-- ── Header bar ── -->
+        <tr>
+          <td style="background:linear-gradient(135deg,#0f2a1e 0%,#0f172a 100%);padding:28px 36px;border-bottom:1px solid #1e293b;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td>
+                  <!-- Logo + brand -->
+                  <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      <td style="padding-right:10px;vertical-align:middle;">
+                        <div style="width:36px;height:36px;background-color:#10b981;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;line-height:36px;text-align:center;">
+                          ⚡
+                        </div>
+                      </td>
+                      <td style="vertical-align:middle;">
+                        <span style="font-size:17px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">Polymarket Signals</span>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+                <td align="right" style="vertical-align:middle;">
+                  <span style="display:inline-block;background-color:#10b98120;border:1px solid #10b98140;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:#10b981;text-transform:uppercase;letter-spacing:0.5px;">
+                    ● Live
+                  </span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- ── Intro block ── -->
+        <tr>
+          <td class="content-block" style="padding:32px 36px 24px;">
+            <h1 class="hero-title" style="margin:0 0 8px;font-size:26px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;line-height:1.2;">
+              📊 Daily Digest — {{DATE}}
+            </h1>
+            <p style="margin:0 0 20px;font-size:15px;color:#94a3b8;line-height:1.6;">
+              Here are today's AI-generated signals for Polymarket crypto markets.
+              Signals updated at <strong style="color:#cbd5e1;">8AM UTC</strong>.
+              {{SIGNALS_COUNT}} signals generated across {{ASSETS_COUNT}} assets.
+            </p>
+
+            <!-- Stats row -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+              style="background-color:#0a1628;border:1px solid #1e293b;border-radius:10px;overflow:hidden;">
+              <tr>
+                <td align="center" style="padding:14px 12px;border-right:1px solid #1e293b;">
+                  <div style="font-size:20px;font-weight:700;color:#10b981;">{{LONG_COUNT}}</div>
+                  <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">LONG</div>
+                </td>
+                <td align="center" style="padding:14px 12px;border-right:1px solid #1e293b;">
+                  <div style="font-size:20px;font-weight:700;color:#f87171;">{{SHORT_COUNT}}</div>
+                  <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">SHORT</div>
+                </td>
+                <td align="center" style="padding:14px 12px;">
+                  <div style="font-size:20px;font-weight:700;color:#ffffff;">{{AVG_CONFIDENCE}}%</div>
+                  <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">Avg Confidence</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- ── Signals table ── -->
+        <tr>
+          <td style="padding:0 36px 32px;">
+
+            <h2 style="margin:0 0 16px;font-size:13px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.8px;">
+              Signals
+            </h2>
+
+            <!-- Table wrapper for border-radius workaround -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+              style="border:1px solid #1e293b;border-radius:10px;overflow:hidden;">
+
+              <!-- Table header -->
+              <tr style="background-color:#0a1628;">
+                <td style="padding:10px 14px;font-size:11px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">Asset</td>
+                <td style="padding:10px 10px;font-size:11px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">Direction</td>
+                <td style="padding:10px 10px;font-size:11px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">Confidence</td>
+                <td class="price-col" style="padding:10px 10px;font-size:11px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">Entry</td>
+                <td class="price-col" style="padding:10px 10px;font-size:11px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">Stop</td>
+                <td class="price-col" style="padding:10px 14px;font-size:11px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">Target</td>
+              </tr>
+
+              <!-- Signal rows — {{SIGNAL_ROWS}} is replaced with generated <tr> blocks -->
+              {{SIGNAL_ROWS}}
+
+              <!-- Example rows showing template format (removed by send_digest.py) -->
+              <!-- LONG example row:
+              <tr style="border-top:1px solid #1e293b;background-color:rgba(16,185,129,0.04);">
+                <td style="padding:13px 14px;">
+                  <span style="font-size:14px;font-weight:700;color:#ffffff;">BTC</span>
+                  <span style="display:block;font-size:11px;color:#475569;margin-top:1px;">15m</span>
+                </td>
+                <td style="padding:13px 10px;">
+                  <span style="display:inline-block;background-color:#10b98120;border:1px solid #10b98140;border-radius:6px;padding:3px 9px;font-size:12px;font-weight:700;color:#10b981;letter-spacing:0.5px;">LONG</span>
+                </td>
+                <td style="padding:13px 10px;">
+                  <span style="font-size:13px;font-weight:600;color:#e2e8f0;">79%</span>
+                  <div style="margin-top:4px;width:60px;height:3px;background-color:#1e293b;border-radius:2px;overflow:hidden;">
+                    <div style="width:79%;height:3px;background-color:#10b981;border-radius:2px;"></div>
+                  </div>
+                </td>
+                <td class="price-col" style="padding:13px 10px;font-size:13px;color:#cbd5e1;font-family:monospace;">$97,234</td>
+                <td class="price-col" style="padding:13px 10px;font-size:13px;color:#f87171;font-family:monospace;">$95,783</td>
+                <td class="price-col" style="padding:13px 14px;font-size:13px;color:#10b981;font-family:monospace;">$100,138</td>
+              </tr>
+              -->
+              <!-- SHORT example row:
+              <tr style="border-top:1px solid #1e293b;background-color:rgba(248,113,113,0.03);">
+                <td style="padding:13px 14px;">
+                  <span style="font-size:14px;font-weight:700;color:#ffffff;">ETH</span>
+                  <span style="display:block;font-size:11px;color:#475569;margin-top:1px;">15m</span>
+                </td>
+                <td style="padding:13px 10px;">
+                  <span style="display:inline-block;background-color:#f8717120;border:1px solid #f8717140;border-radius:6px;padding:3px 9px;font-size:12px;font-weight:700;color:#f87171;letter-spacing:0.5px;">SHORT</span>
+                </td>
+                <td style="padding:13px 10px;">
+                  <span style="font-size:13px;font-weight:600;color:#e2e8f0;">65%</span>
+                  <div style="margin-top:4px;width:60px;height:3px;background-color:#1e293b;border-radius:2px;overflow:hidden;">
+                    <div style="width:65%;height:3px;background-color:#f87171;border-radius:2px;"></div>
+                  </div>
+                </td>
+                <td class="price-col" style="padding:13px 10px;font-size:13px;color:#cbd5e1;font-family:monospace;">$3,421</td>
+                <td class="price-col" style="padding:13px 10px;font-size:13px;color:#f87171;font-family:monospace;">$3,472</td>
+                <td class="price-col" style="padding:13px 14px;font-size:13px;color:#10b981;font-family:monospace;">$3,319</td>
+              </tr>
+              -->
+
+            </table>
+          </td>
+        </tr>
+
+        <!-- ── CTA block ── -->
+        <tr>
+          <td style="padding:0 36px 36px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+              style="background-color:#0a1628;border:1px solid #1e293b;border-radius:10px;overflow:hidden;">
+              <tr>
+                <td style="padding:20px 24px;">
+                  <p style="margin:0 0 14px;font-size:14px;color:#94a3b8;line-height:1.5;">
+                    View full signal details, historical performance, and multi-timeframe analysis in your dashboard.
+                  </p>
+                  <a href="{{DASHBOARD_URL}}"
+                    style="display:inline-block;background-color:#10b981;color:#ffffff;font-size:13px;font-weight:600;text-decoration:none;padding:10px 22px;border-radius:8px;letter-spacing:0.2px;">
+                    Open Dashboard →
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- ── Divider ── -->
+        <tr>
+          <td style="padding:0 36px;">
+            <div style="height:1px;background-color:#1e293b;"></div>
+          </td>
+        </tr>
+
+        <!-- ── Footer ── -->
+        <tr>
+          <td style="padding:24px 36px 28px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td>
+                  <p style="margin:0 0 6px;font-size:12px;color:#334155;line-height:1.6;">
+                    You are receiving this because you subscribed to Polymarket Signals ({{PLAN_NAME}} plan)
+                    with <a href="mailto:{{USER_EMAIL}}" style="color:#475569;text-decoration:none;">{{USER_EMAIL}}</a>.
+                  </p>
+                  <p style="margin:0 0 12px;font-size:11px;color:#1e293b;line-height:1.6;">
+                    <strong style="color:#334155;">Disclaimer:</strong>
+                    All signals are for informational purposes only and do not constitute financial or investment advice.
+                    Past performance does not guarantee future results. Trading prediction markets involves substantial risk.
+                    Polymarket Signals is not a licensed financial advisor.
+                  </p>
+                  <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      <td style="padding-right:16px;">
+                        <a href="{{UNSUBSCRIBE_URL}}" style="font-size:12px;color:#475569;text-decoration:underline;">Unsubscribe</a>
+                      </td>
+                      <td style="padding-right:16px;">
+                        <a href="{{ACCOUNT_URL}}" style="font-size:12px;color:#475569;text-decoration:underline;">Manage subscription</a>
+                      </td>
+                      <td>
+                        <a href="{{PRIVACY_URL}}" style="font-size:12px;color:#475569;text-decoration:underline;">Privacy Policy</a>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding-top:16px;">
+                  <p style="margin:0;font-size:11px;color:#1e293b;">
+                    &copy; 2026 Polymarket Signals. All rights reserved.<br />
+                    Singapore
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+      </table>
+      <!-- /Email card -->
+
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>
