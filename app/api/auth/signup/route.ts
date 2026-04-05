@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { createUser, getUser, upsertSubscription } from '@/lib/db';
 import { signToken, setSessionCookie } from '@/lib/auth';
+import { applyReferral } from '@/lib/db-extras';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,6 +10,9 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const refCode = searchParams.get('ref');
+
     const body = await request.json();
     const { email, password } = body as { email?: string; password?: string };
 
@@ -55,6 +59,16 @@ export async function POST(request: NextRequest) {
       plan: 'basic',
       status: 'inactive',
     });
+
+    // Apply referral if a valid ref code was provided
+    if (refCode && refCode.trim().length > 0) {
+      try {
+        applyReferral(refCode.trim(), user.id);
+      } catch (refErr) {
+        // Non-fatal: log and continue
+        console.warn('[signup] applyReferral error:', refErr);
+      }
+    }
 
     // Sign JWT and set cookie
     const token = await signToken({ userId: user.id, email: user.email });

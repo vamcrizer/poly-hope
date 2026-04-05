@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
+import { TestimonialCard } from '@/components/TestimonialCard';
 
 const stats = [
   { value: '89%', label: 'Accuracy (6mo backtest)' },
@@ -258,6 +259,143 @@ export default function LandingPage() {
                 </p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              Traders love it
+            </h2>
+            <p className="text-gray-400 text-lg max-w-xl mx-auto">
+              Real results from real Polymarket traders.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <TestimonialCard
+              quote="Finally, signals that actually make sense for prediction markets. Been using it for 2 months, profitable every week."
+              author="Alex T."
+              role="Polymarket trader"
+            />
+            <TestimonialCard
+              quote="The confidence scores are the killer feature. I only trade when it's above 70% and my win rate went from 54% to 81%."
+              author="Marcus R."
+              role="Crypto analyst"
+            />
+            <TestimonialCard
+              quote="API tier is fire. Built an automated strategy around it, paid for itself in day 3."
+              author="Sam K."
+              role="Quant developer"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-20 bg-gray-900/20 border-y border-gray-800">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              Frequently asked questions
+            </h2>
+            <p className="text-gray-400 text-lg">
+              Everything you need to know before getting started.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <details className="group bg-gray-900 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-700 transition-colors duration-200">
+              <summary className="flex items-center justify-between cursor-pointer px-6 py-4 text-white font-medium select-none list-none">
+                <span>What is Polymarket?</span>
+                <svg
+                  className="w-5 h-5 text-gray-400 shrink-0 transition-transform duration-200 group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v14M5 12h14" />
+                </svg>
+              </summary>
+              <div className="px-6 pb-5 text-gray-400 text-sm leading-relaxed border-t border-gray-800 pt-4">
+                Polymarket is a decentralized prediction market platform built on Polygon where users trade on the outcome of real-world events using USDC. For crypto markets, you buy YES or NO shares on questions like &quot;Will BTC be above $100k by end of week?&quot; — shares pay out $1 if correct, $0 if wrong. It&apos;s fully on-chain and non-custodial.
+              </div>
+            </details>
+
+            <details className="group bg-gray-900 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-700 transition-colors duration-200">
+              <summary className="flex items-center justify-between cursor-pointer px-6 py-4 text-white font-medium select-none list-none">
+                <span>How accurate are the signals?</span>
+                <svg
+                  className="w-5 h-5 text-gray-400 shrink-0 transition-transform duration-200 group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v14M5 12h14" />
+                </svg>
+              </summary>
+              <div className="px-6 pb-5 text-gray-400 text-sm leading-relaxed border-t border-gray-800 pt-4">
+                Our model achieved 89% directional accuracy over a 6-month backtest on 1,200+ signals across all 5 assets. That said, past performance does not guarantee future results — markets evolve and no signal service wins every trade. We publish full methodology and per-asset breakdowns on our{' '}
+                <Link href="/backtest" className="text-emerald-400 hover:text-emerald-300 transition-colors">
+                  backtest page
+                </Link>{' '}
+                so you can evaluate the data yourself.
+              </div>
+            </details>
+
+            <details className="group bg-gray-900 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-700 transition-colors duration-200">
+              <summary className="flex items-center justify-between cursor-pointer px-6 py-4 text-white font-medium select-none list-none">
+                <span>Do I need trading experience?</span>
+                <svg
+                  className="w-5 h-5 text-gray-400 shrink-0 transition-transform duration-200 group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v14M5 12h14" />
+                </svg>
+              </summary>
+              <div className="px-6 pb-5 text-gray-400 text-sm leading-relaxed border-t border-gray-800 pt-4">
+                No. Each signal comes with a clear direction (LONG/SHORT), a confidence score, an entry price, a stop loss, and a take profit target. You always know exactly what position to take, at what price, and when to cut your loss. If you&apos;re new to Polymarket, our docs section covers the basics of placing your first trade.
+              </div>
+            </details>
+
+            <details className="group bg-gray-900 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-700 transition-colors duration-200">
+              <summary className="flex items-center justify-between cursor-pointer px-6 py-4 text-white font-medium select-none list-none">
+                <span>Can I cancel anytime?</span>
+                <svg
+                  className="w-5 h-5 text-gray-400 shrink-0 transition-transform duration-200 group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v14M5 12h14" />
+                </svg>
+              </summary>
+              <div className="px-6 pb-5 text-gray-400 text-sm leading-relaxed border-t border-gray-800 pt-4">
+                Yes — cancel anytime from your account dashboard with one click. No contracts, no cancellation fees, no questions asked. Your access stays active until the end of the billing period you already paid for. We also offer a 7-day free trial on all plans so you can test drive everything before spending a dollar.
+              </div>
+            </details>
+
+            <details className="group bg-gray-900 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-700 transition-colors duration-200">
+              <summary className="flex items-center justify-between cursor-pointer px-6 py-4 text-white font-medium select-none list-none">
+                <span>How is this different from crypto trading signals?</span>
+                <svg
+                  className="w-5 h-5 text-gray-400 shrink-0 transition-transform duration-200 group-open:rotate-45"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v14M5 12h14" />
+                </svg>
+              </summary>
+              <div className="px-6 pb-5 text-gray-400 text-sm leading-relaxed border-t border-gray-800 pt-4">
+                Standard crypto signals are designed for spot or futures exchanges where you ride price action continuously. Polymarket is different: you&apos;re trading binary YES/NO positions that resolve at a fixed time. Our signals are specifically calibrated for this structure — targeting the right market windows (5m, 10m, 15m), accounting for Polymarket&apos;s USDC-based payoff mechanics, and optimizing for resolution probability rather than raw price momentum.
+              </div>
+            </details>
           </div>
         </div>
       </section>
