@@ -277,19 +277,19 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <TestimonialCard
-              quote="Finally, signals that actually make sense for prediction markets. Been using it for 2 months, profitable every week."
-              author="Alex T."
+              quote="Been using for 3 months, hit 87% win rate on my LONG plays. The 15m signals are especially sharp during Asia session."
+              author="cryptowhale_eth"
               role="Polymarket trader"
             />
             <TestimonialCard
-              quote="The confidence scores are the killer feature. I only trade when it's above 70% and my win rate went from 54% to 81%."
-              author="Marcus R."
-              role="Crypto analyst"
+              quote="Finally a signal service that explains their methodology. The backtest data gives me confidence to size up positions."
+              author="polymarket_dan"
+              role="Prediction market trader"
             />
             <TestimonialCard
-              quote="API tier is fire. Built an automated strategy around it, paid for itself in day 3."
-              author="Sam K."
-              role="Quant developer"
+              quote="Switched from manually analyzing 5 assets to just checking the daily digest. Saves 2 hours every morning."
+              author="defi_nguyen"
+              role="DeFi trader"
             />
           </div>
         </div>
@@ -479,28 +479,37 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="py-20 border-t border-gray-800">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-3xl mx-auto mb-6">
-            ⚡
+      {/* Free Trial CTA */}
+      <section className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/60 via-[#0a0a0f] to-emerald-950/40 pointer-events-none" />
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-emerald-500/8 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-[300px] h-[200px] bg-emerald-400/5 rounded-full blur-3xl" />
+        </div>
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center gap-2 bg-emerald-500/15 border border-emerald-500/30 rounded-full px-4 py-1.5 text-emerald-400 text-xs font-medium tracking-wide uppercase mb-8">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            Limited offer — 3 days free, no card required
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-            Ready to trade with an edge?
+          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-5 tracking-tight">
+            Start your 3-day free trial
           </h2>
-          <p className="text-gray-400 text-lg mb-8">
-            Join traders already using Polymarket Signals to outperform the market.
-            7-day free trial. No credit card required.
+          <p className="text-gray-400 text-lg mb-10 max-w-xl mx-auto leading-relaxed">
+            Get full access to all signals, backtests, and analysis tools. See exactly why traders are
+            switching to data-driven Polymarket positions.
           </p>
           <Link
             href="/signup"
-            className="inline-flex items-center gap-2 px-8 py-4 text-base font-semibold text-white bg-emerald-500 hover:bg-emerald-600 rounded-xl border border-emerald-500 shadow-xl shadow-emerald-500/25 transition-all duration-150"
+            className="inline-flex items-center gap-2 px-10 py-4 text-base font-bold text-white bg-emerald-500 hover:bg-emerald-400 rounded-xl border border-emerald-400 shadow-2xl shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-150"
           >
-            Start Free Trial
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            Get Free Access
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </Link>
+          <p className="mt-5 text-xs text-gray-600">
+            No credit card required &middot; Instant access &middot; Cancel before trial ends and pay nothing
+          </p>
         </div>
       </section>
 

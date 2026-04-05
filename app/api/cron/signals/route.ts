@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { deliverToAllSubscribers } from '@/lib/webhook-delivery';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -237,6 +238,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     } catch (err) {
       errors.push(`Save error: ${String(err)}`);
     }
+  }
+
+  // Deliver to webhook subscribers (fire-and-forget, non-blocking)
+  if (generated.length > 0) {
+    const now = new Date().toISOString();
+    const signalsWithTimestamp = generated.map((s) => ({ ...s, generated_at: now }));
+    deliverToAllSubscribers(signalsWithTimestamp).catch((err) => {
+      console.error('[cron/signals] webhook delivery error:', err);
+    });
   }
 
   return NextResponse.json({
