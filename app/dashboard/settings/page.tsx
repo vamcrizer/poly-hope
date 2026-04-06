@@ -81,18 +81,18 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-2xl mx-auto py-10 px-4 space-y-8">
-      <h1 className="text-2xl font-bold">Settings</h1>
+      <h1 className="text-2xl font-bold text-white">Settings</h1>
 
       {/* Telegram Alerts */}
-      <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+      <section className="rounded-xl border border-gray-800 bg-gray-900/60 p-6 shadow-lg">
         <div className="flex items-center justify-between mb-1">
-          <h2 className="text-lg font-semibold">Telegram Alerts</h2>
+          <h2 className="text-lg font-semibold text-white">Telegram Alerts</h2>
           {!loadingStatus && (
             <span
               className={`text-xs font-semibold px-2 py-1 rounded-full ${
                 savedChatId
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-gray-100 text-gray-500'
+                  ? 'bg-emerald-500/20 text-emerald-400'
+                  : 'bg-gray-800 text-gray-400'
               }`}
             >
               {savedChatId ? 'Enabled' : 'Not configured'}
@@ -103,27 +103,27 @@ export default function SettingsPage() {
           Receive trade signals directly in Telegram.
         </p>
 
-        <ol className="text-sm text-gray-700 space-y-1 mb-5 list-decimal list-inside">
+        <ol className="text-sm text-gray-300 space-y-1 mb-5 list-decimal list-inside">
           <li>
             Start{' '}
             <a
               href="https://t.me/PolySignalsBot"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-indigo-600 hover:underline font-medium"
+              className="text-emerald-400 hover:underline font-medium"
             >
               @PolySignalsBot
             </a>{' '}
             on Telegram.
           </li>
-          <li>Send <code className="bg-gray-100 rounded px-1">/start</code> to the bot.</li>
+          <li>Send <code className="bg-gray-800 rounded px-1">/start</code> to the bot.</li>
           <li>The bot will reply with your chat ID. Copy it.</li>
           <li>Paste your chat ID below and save.</li>
         </ol>
 
         <form onSubmit={handleSave} className="space-y-4">
           <div>
-            <label htmlFor="chat-id" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="chat-id" className="block text-sm font-medium text-gray-300 mb-1">
               Telegram Chat ID
             </label>
             <input
@@ -132,22 +132,22 @@ export default function SettingsPage() {
               value={chatId}
               onChange={(e) => setChatId(e.target.value)}
               placeholder="e.g. 123456789"
-              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
 
           {saveError && (
-            <p className="text-sm text-red-600">{saveError}</p>
+            <p className="text-sm text-red-500">{saveError}</p>
           )}
           {saveSuccess && (
-            <p className="text-sm text-green-600">Chat ID saved successfully.</p>
+            <p className="text-sm text-emerald-400">Chat ID saved successfully.</p>
           )}
 
           <div className="flex gap-3">
             <button
               type="submit"
               disabled={saving || chatId.trim() === ''}
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {saving ? 'Saving…' : 'Save'}
             </button>
@@ -157,7 +157,7 @@ export default function SettingsPage() {
                 type="button"
                 onClick={handleTest}
                 disabled={testing}
-                className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-sm font-semibold text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {testing ? 'Sending…' : 'Test Alert'}
               </button>
@@ -165,7 +165,7 @@ export default function SettingsPage() {
           </div>
 
           {testResult && (
-            <p className={`text-sm ${testResult.ok ? 'text-green-600' : 'text-red-600'}`}>
+            <p className={`text-sm ${testResult.ok ? 'text-emerald-400' : 'text-red-500'}`}>
               {testResult.message}
             </p>
           )}
@@ -173,8 +173,8 @@ export default function SettingsPage() {
       </section>
 
       {/* Email Preferences */}
-      <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold mb-1">Email Preferences</h2>
+      <section className="rounded-xl border border-gray-800 bg-gray-900/60 p-6 shadow-lg">
+        <h2 className="text-lg font-semibold text-white mb-1">Email Preferences</h2>
         <p className="text-sm text-gray-500 mb-5">
           Control which email notifications you receive.
         </p>
@@ -189,7 +189,7 @@ export default function SettingsPage() {
             />
             <div
               className={`w-10 h-6 rounded-full transition-colors ${
-                emailAlertsEnabled ? 'bg-indigo-600' : 'bg-gray-300'
+                emailAlertsEnabled ? 'bg-emerald-500' : 'bg-gray-700'
               }`}
             />
             <div
@@ -198,7 +198,7 @@ export default function SettingsPage() {
               }`}
             />
           </div>
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-gray-300">
             Daily signals digest email
           </span>
         </label>
