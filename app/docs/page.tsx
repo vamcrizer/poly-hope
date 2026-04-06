@@ -211,6 +211,59 @@ export default function DocsPage() {
                 </div>
               </div>
             </div>
+
+            {/* GET /history */}
+            <div className="space-y-6 mt-8">
+              <div className="rounded-xl border border-gray-800 overflow-hidden">
+                <div className="flex items-center gap-3 px-5 py-4 bg-gray-900/60 border-b border-gray-800">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded text-xs font-bold font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    GET
+                  </span>
+                  <code className="text-sm font-mono text-gray-200">/api/v1/history</code>
+                  <span className="ml-auto text-xs text-gray-500">Paginated signal history</span>
+                </div>
+                <div className="p-5 space-y-5">
+                  <p className="text-gray-400 text-sm leading-relaxed">
+                    Returns paginated historical signals. Supports filtering by asset, direction, and page.
+                    Up to 100 records per page. Returns oldest-to-newest by default.
+                  </p>
+                  <div>
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Query Parameters</p>
+                    <div className="rounded-lg border border-gray-800 overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="bg-gray-900/60">
+                            <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Param</th>
+                            <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Default</th>
+                            <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-800/50 text-xs">
+                          {[
+                            { p: 'asset', d: 'ALL', desc: 'Filter by asset. One of: BTC, ETH, SOL, XRP, DOGE, or ALL' },
+                            { p: 'direction', d: 'ALL', desc: 'Filter by direction. One of: LONG, SHORT, or ALL' },
+                            { p: 'page', d: '1', desc: 'Page number (1-indexed)' },
+                            { p: 'limit', d: '50', desc: 'Records per page. Max 100.' },
+                          ].map((row) => (
+                            <tr key={row.p}>
+                              <td className="px-4 py-3"><code className="text-yellow-400 font-mono">{row.p}</code></td>
+                              <td className="px-4 py-3 font-mono text-gray-500">{row.d}</td>
+                              <td className="px-4 py-3 text-gray-400">{row.desc}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <div className="rounded-lg bg-gray-950 border border-gray-800 p-4 overflow-x-auto">
+                    <p className="text-xs text-gray-600 font-mono mb-1"># BTC LONG signals, page 2</p>
+                    <code className="text-xs font-mono text-gray-300 whitespace-pre">
+                      GET /api/v1/history?asset=BTC&direction=LONG&page=2&limit=25
+                    </code>
+                  </div>
+                </div>
+              </div>
+            </div>
           </section>
 
           {/* Response Schema */}
