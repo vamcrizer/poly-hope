@@ -10,6 +10,7 @@ db.exec(`
     email_alerts_enabled INTEGER NOT NULL DEFAULT 1,
     slack_webhook_url TEXT,
     min_confidence REAL NOT NULL DEFAULT 0,
+    alert_assets TEXT NOT NULL DEFAULT 'BTC,ETH,SOL,XRP,DOGE',
     created_at TEXT DEFAULT (datetime('now'))
   );
 
@@ -32,6 +33,7 @@ export interface UserSettings {
   email_alerts_enabled: number; // SQLite boolean: 1 = true, 0 = false
   slack_webhook_url: string | null;
   min_confidence: number; // 0.0–1.0
+  alert_assets: string; // comma-separated, default 'BTC,ETH,SOL,XRP,DOGE'
   created_at: string;
 }
 
@@ -60,7 +62,7 @@ export function getUserSettings(userId: number): UserSettings | undefined {
 
 export function upsertUserSettings(
   userId: number,
-  settings: Partial<Pick<UserSettings, 'telegram_chat_id' | 'email_alerts_enabled' | 'slack_webhook_url' | 'min_confidence'>>,
+  settings: Partial<Pick<UserSettings, 'telegram_chat_id' | 'email_alerts_enabled' | 'slack_webhook_url' | 'min_confidence' | 'alert_assets'>>,
 ): void {
   const existing = getUserSettings(userId);
 
@@ -70,25 +72,28 @@ export function upsertUserSettings(
         telegram_chat_id = COALESCE(?, telegram_chat_id),
         email_alerts_enabled = COALESCE(?, email_alerts_enabled),
         slack_webhook_url = COALESCE(?, slack_webhook_url),
-        min_confidence = COALESCE(?, min_confidence)
+        min_confidence = COALESCE(?, min_confidence),
+        alert_assets = COALESCE(?, alert_assets)
       WHERE user_id = ?
     `).run(
       settings.telegram_chat_id ?? null,
       settings.email_alerts_enabled ?? null,
       settings.slack_webhook_url ?? null,
       settings.min_confidence ?? null,
+      settings.alert_assets ?? null,
       userId,
     );
   } else {
     db.prepare(`
-      INSERT INTO user_settings (user_id, telegram_chat_id, email_alerts_enabled, slack_webhook_url, min_confidence)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO user_settings (user_id, telegram_chat_id, email_alerts_enabled, slack_webhook_url, min_confidence, alert_assets)
+      VALUES (?, ?, ?, ?, ?, ?)
     `).run(
       userId,
       settings.telegram_chat_id ?? null,
       settings.email_alerts_enabled ?? 1,
       settings.slack_webhook_url ?? null,
       settings.min_confidence ?? 0,
+      settings.alert_assets ?? 'BTC,ETH,SOL,XRP,DOGE',
     );
   }
 }

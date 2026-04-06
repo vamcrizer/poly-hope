@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     email_alerts_enabled: settings ? settings.email_alerts_enabled === 1 : true,
     min_confidence: settings?.min_confidence ?? 0,
+    alert_assets: settings?.alert_assets ?? 'BTC,ETH,SOL,XRP,DOGE',
   });
 }
 
@@ -21,15 +22,20 @@ export async function POST(request: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await request.json();
-  const { email_alerts_enabled, min_confidence } = body as { email_alerts_enabled?: boolean; min_confidence?: number };
-
-  if (typeof email_alerts_enabled !== 'boolean' && typeof min_confidence !== 'number') {
-    return NextResponse.json({ error: 'email_alerts_enabled or min_confidence required' }, { status: 400 });
-  }
+  const { email_alerts_enabled, min_confidence, alert_assets } = body as {
+    email_alerts_enabled?: boolean;
+    min_confidence?: number;
+    alert_assets?: string;
+  };
 
   const updates: Parameters<typeof upsertUserSettings>[1] = {};
   if (typeof email_alerts_enabled === 'boolean') updates.email_alerts_enabled = email_alerts_enabled ? 1 : 0;
   if (typeof min_confidence === 'number' && min_confidence >= 0 && min_confidence <= 1) updates.min_confidence = min_confidence;
+  if (typeof alert_assets === 'string' && alert_assets.length > 0) updates.alert_assets = alert_assets;
+
+  if (Object.keys(updates).length === 0) {
+    return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
+  }
 
   upsertUserSettings(session.userId, updates);
   return NextResponse.json({ success: true });

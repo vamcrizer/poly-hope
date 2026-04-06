@@ -18,6 +18,7 @@ export default function SettingsPage() {
   const [emailAlertsEnabled, setEmailAlertsEnabled] = useState(true);
   const [savingEmail, setSavingEmail] = useState(false);
   const [minConfidence, setMinConfidence] = useState(0);
+  const [alertAssets, setAlertAssets] = useState<string[]>(['BTC', 'ETH', 'SOL', 'XRP', 'DOGE']);
   const [slackUrl, setSlackUrl] = useState('');
   const [savedSlackUrl, setSavedSlackUrl] = useState<string | null>(null);
   const [savingSlack, setSavingSlack] = useState(false);
@@ -41,7 +42,7 @@ export default function SettingsPage() {
 
     const loadNotifs = fetch('/api/user/notifications')
       .then((res) => res.ok ? res.json() : null)
-      .then((data) => { if (data) { setEmailAlertsEnabled(data.email_alerts_enabled); if (typeof data.min_confidence === 'number') setMinConfidence(data.min_confidence); } })
+      .then((data) => { if (data) { setEmailAlertsEnabled(data.email_alerts_enabled); if (typeof data.min_confidence === 'number') setMinConfidence(data.min_confidence); if (data.alert_assets) setAlertAssets(data.alert_assets.split(',').map((a: string) => a.trim())); } })
       .catch(console.error);
 
     const loadSlack = fetch('/api/user/slack')
@@ -79,6 +80,19 @@ export default function SettingsPage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ min_confidence: val }),
+    }).catch(() => {});
+  }
+
+  async function handleAssetToggle(asset: string) {
+    const next = alertAssets.includes(asset)
+      ? alertAssets.filter((a) => a !== asset)
+      : [...alertAssets, asset];
+    if (next.length === 0) return; // always keep at least one
+    setAlertAssets(next);
+    await fetch('/api/user/notifications', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ alert_assets: next.join(',') }),
     }).catch(() => {});
   }
 
@@ -348,6 +362,27 @@ export default function SettingsPage() {
           When enabled, you&apos;ll receive the daily signals digest at 8AM UTC.
           {savingEmail && <span className="ml-2 text-gray-600">Saving…</span>}
         </p>
+
+        {/* Asset selection */}
+        <div className="mt-5 pt-5 border-t border-gray-800">
+          <p className="text-sm font-medium text-gray-300 mb-2">Alert assets</p>
+          <p className="text-xs text-gray-500 mb-3">Only receive alerts for selected assets.</p>
+          <div className="flex flex-wrap gap-2">
+            {['BTC', 'ETH', 'SOL', 'XRP', 'DOGE'].map((asset) => (
+              <button
+                key={asset}
+                onClick={() => handleAssetToggle(asset)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                  alertAssets.includes(asset)
+                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                    : 'bg-gray-800 text-gray-600 border-gray-700 hover:border-gray-600'
+                }`}
+              >
+                {asset}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* Minimum confidence threshold */}
         <div className="mt-5 pt-5 border-t border-gray-800">
