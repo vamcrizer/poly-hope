@@ -27,6 +27,13 @@ export default function SettingsPage() {
   const [testingSlack, setTestingSlack] = useState(false);
   const [slackTestResult, setSlackTestResult] = useState<boolean | null>(null);
   const [canUseSlack, setCanUseSlack] = useState(false);
+  const [discordUrl, setDiscordUrl] = useState('');
+  const [savedDiscordUrl, setSavedDiscordUrl] = useState<string | null>(null);
+  const [savingDiscord, setSavingDiscord] = useState(false);
+  const [discordError, setDiscordError] = useState<string | null>(null);
+  const [discordSuccess, setDiscordSuccess] = useState(false);
+  const [testingDiscord, setTestingDiscord] = useState(false);
+  const [discordTestResult, setDiscordTestResult] = useState<boolean | null>(null);
 
   useEffect(() => {
     const loadTelegram = fetch('/api/user/telegram')
@@ -50,12 +57,17 @@ export default function SettingsPage() {
       .then((data) => { if (data?.slack_webhook_url) { setSavedSlackUrl(data.slack_webhook_url); setSlackUrl(data.slack_webhook_url); } })
       .catch(console.error);
 
+    const loadDiscord = fetch('/api/user/discord')
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => { if (data?.discord_webhook_url) { setSavedDiscordUrl(data.discord_webhook_url); setDiscordUrl(data.discord_webhook_url); } })
+      .catch(console.error);
+
     const loadSub = fetch('/api/user/subscription')
       .then((res) => res.ok ? res.json() : null)
       .then((data) => { if (data && ['pro', 'api'].includes(data.plan) && data.status === 'active') setCanUseSlack(true); })
       .catch(console.error);
 
-    Promise.allSettled([loadTelegram, loadNotifs, loadSlack, loadSub]).finally(() => setLoadingStatus(false));
+    Promise.allSettled([loadTelegram, loadNotifs, loadSlack, loadDiscord, loadSub]).finally(() => setLoadingStatus(false));
   }, []);
 
   async function handleEmailToggle(enabled: boolean) {
@@ -123,6 +135,35 @@ export default function SettingsPage() {
       setSlackTestResult(data.success === true);
     } catch { setSlackTestResult(false); }
     finally { setTestingSlack(false); }
+  }
+
+  async function handleSaveDiscord(e: React.FormEvent) {
+    e.preventDefault();
+    setSavingDiscord(true);
+    setDiscordError(null);
+    setDiscordSuccess(false);
+    try {
+      const res = await fetch('/api/user/discord', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ discord_webhook_url: discordUrl }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setDiscordError(data.error || 'Failed to save'); }
+      else { setSavedDiscordUrl(discordUrl); setDiscordSuccess(true); setTimeout(() => setDiscordSuccess(false), 3000); }
+    } catch { setDiscordError('Network error'); }
+    finally { setSavingDiscord(false); }
+  }
+
+  async function handleTestDiscord() {
+    setTestingDiscord(true);
+    setDiscordTestResult(null);
+    try {
+      const res = await fetch('/api/user/discord', { method: 'PUT' });
+      const data = await res.json();
+      setDiscordTestResult(data.success === true);
+    } catch { setDiscordTestResult(false); }
+    finally { setTestingDiscord(false); }
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -323,6 +364,65 @@ export default function SettingsPage() {
         ) : (
           <a href="/pricing" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-sm hover:bg-emerald-500/20 transition-colors">
             Upgrade to Pro to enable Slack alerts →
+          </a>
+        )}
+      </section>
+
+      {/* Discord integration */}
+      <section className="rounded-xl border border-gray-800 bg-gray-900/60 p-6 shadow-lg">
+        <div className="flex items-start justify-between mb-1">
+          <h2 className="text-lg font-semibold text-white">Discord Alerts</h2>
+          {!canUseSlack && (
+            <a href="/pricing" className="text-xs text-emerald-400 border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+              Pro / API only
+            </a>
+          )}
+        </div>
+        <p className="text-sm text-gray-500 mb-5">
+          Post signal alerts to your Discord server via incoming webhook.
+        </p>
+        {canUseSlack ? (
+          <form onSubmit={handleSaveDiscord} className="space-y-4">
+            <div>
+              <label className="block text-xs text-gray-400 mb-1.5">Discord Webhook URL</label>
+              <input
+                type="url"
+                value={discordUrl}
+                onChange={(e) => setDiscordUrl(e.target.value)}
+                placeholder="https://discord.com/api/webhooks/..."
+                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-mono text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
+              />
+            </div>
+            {discordError && <p className="text-xs text-red-400">{discordError}</p>}
+            {discordSuccess && <p className="text-xs text-emerald-400">Saved successfully!</p>}
+            <div className="flex items-center gap-3">
+              <button
+                type="submit"
+                disabled={savingDiscord}
+                className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium transition-colors disabled:opacity-50"
+              >
+                {savingDiscord ? 'Saving...' : 'Save'}
+              </button>
+              {savedDiscordUrl && (
+                <button
+                  type="button"
+                  onClick={handleTestDiscord}
+                  disabled={testingDiscord}
+                  className="px-4 py-2 rounded-lg border border-gray-700 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm transition-colors disabled:opacity-50"
+                >
+                  {testingDiscord ? 'Testing...' : 'Test'}
+                </button>
+              )}
+              {discordTestResult !== null && (
+                <span className={`text-xs ${discordTestResult ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {discordTestResult ? '✓ Delivered' : '✗ Failed'}
+                </span>
+              )}
+            </div>
+          </form>
+        ) : (
+          <a href="/pricing" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-sm hover:bg-emerald-500/20 transition-colors">
+            Upgrade to Pro to enable Discord alerts →
           </a>
         )}
       </section>

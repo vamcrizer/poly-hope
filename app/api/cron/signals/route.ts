@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { deliverToAllSubscribers } from '@/lib/webhook-delivery';
 import { sendSlackSignals } from '@/lib/slack';
+import { sendDiscordSignals } from '@/lib/discord';
 import { sendSignalsEmail } from '@/lib/email';
 import db from '@/lib/db';
 
@@ -269,6 +270,26 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       }
     } catch (err) {
       console.error('[cron/signals] slack delivery error:', err);
+    }
+
+    // Discord delivery — Pro/API subscribers with discord_webhook_url
+    try {
+      const discordUsers = db.prepare(`
+        SELECT us.discord_webhook_url
+        FROM user_settings us
+        JOIN subscriptions s ON s.user_id = us.user_id
+        WHERE us.discord_webhook_url IS NOT NULL
+          AND s.status = 'active'
+          AND s.plan IN ('pro', 'api')
+      `).all() as { discord_webhook_url: string }[];
+
+      const now2 = new Date().toISOString();
+      const generatedWithTs = generated.map((s) => ({ ...s, generated_at: now2 }));
+      for (const row of discordUsers) {
+        sendDiscordSignals(row.discord_webhook_url, generatedWithTs as any).catch(() => {});
+      }
+    } catch (err) {
+      console.error('[cron/signals] discord delivery error:', err);
     }
 
     // Email digest — all active subscribers with email_alerts_enabled

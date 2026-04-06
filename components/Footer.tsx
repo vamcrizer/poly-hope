@@ -52,6 +52,7 @@ export function Footer() {
             </h3>
             <ul className="space-y-2.5">
               <li><Link href="/docs" className="text-sm text-gray-500 hover:text-white transition-colors">API Docs</Link></li>
+              <li><Link href="/guides" className="text-sm text-gray-500 hover:text-white transition-colors">Guides</Link></li>
               <li><Link href="/faq" className="text-sm text-gray-500 hover:text-white transition-colors">FAQ</Link></li>
               <li><Link href="/performance" className="text-sm text-gray-500 hover:text-white transition-colors">Performance</Link></li>
               <li><Link href="/changelog" className="text-sm text-gray-500 hover:text-white transition-colors">Changelog</Link></li>
