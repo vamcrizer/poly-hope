@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { TestimonialCard } from '@/components/TestimonialCard';
 
 const stats = [
-  { value: '89%', label: 'Accuracy (6mo backtest)' },
+  { value: '2.5:1', label: 'Avg Risk:Reward Ratio' },
   { value: '5', label: 'Assets Covered' },
   { value: '8AM UTC', label: 'Updated Daily' },
   { value: '1,200+', label: 'Signals Generated' },
@@ -338,7 +338,7 @@ export default function LandingPage() {
                 </svg>
               </summary>
               <div className="px-6 pb-5 text-gray-400 text-sm leading-relaxed border-t border-gray-800 pt-4">
-                Our model achieved 89% directional accuracy over a 6-month backtest on 1,200+ signals across all 5 assets. That said, past performance does not guarantee future results — markets evolve and no signal service wins every trade. We publish full methodology and per-asset breakdowns on our{' '}
+                Our strategy targets a 2.5:1 risk-to-reward ratio using RSI extremes, MACD confirmation, and ATR-based position sizing across 1,200+ signals on 5 assets. Past performance does not guarantee future results — markets evolve and no signal service wins every trade. We publish full methodology and per-asset breakdowns on our{' '}
                 <Link href="/backtest" className="text-emerald-400 hover:text-emerald-300 transition-colors">
                   backtest page
                 </Link>{' '}

@@ -203,7 +203,7 @@ export default function PreviewPage() {
         {/* Stats row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
           {[
-            { value: '89%', label: 'Backtest accuracy' },
+            { value: '2.5:1', label: 'Risk:Reward target' },
             { value: '1,200+', label: 'Signals generated' },
             { value: '5', label: 'Assets covered' },
             { value: '2.1x', label: 'Avg risk:reward' },

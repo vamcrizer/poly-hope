@@ -13,7 +13,7 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://polymarketsignals.co
 export const metadata: Metadata = {
   title: "Polymarket Signals — AI-Powered Crypto Prediction Signals",
   description:
-    "Get AI-powered trading signals for Polymarket crypto prediction markets. BTC, ETH, SOL, XRP, DOGE signals with 89% accuracy. Updated daily at 8AM UTC.",
+    "Get AI-powered trading signals for Polymarket crypto prediction markets. BTC, ETH, SOL, XRP, DOGE signals with 2.5:1 risk:reward targeting. Updated daily at 8AM UTC.",
   keywords:
     "Polymarket, crypto signals, prediction markets, BTC signals, ETH signals, trading signals, AI trading",
   metadataBase: new URL(APP_URL),
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Polymarket Signals — AI-Powered Crypto Prediction Signals",
     description:
-      "Get AI-powered trading signals for Polymarket crypto prediction markets. 89% accuracy. Updated daily.",
+      "Get AI-powered trading signals for Polymarket crypto prediction markets. 2.5:1 risk:reward targeting. Updated daily.",
     type: "website",
     siteName: "Polymarket Signals",
     url: APP_URL,

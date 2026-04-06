@@ -10,8 +10,8 @@ const badges = [
         />
       </svg>
     ),
-    label: '89% Backtest Accuracy',
-    sub: '6-month backtest, 1,200+ signals',
+    label: '2.5:1 Avg Risk:Reward',
+    sub: '90-day backtest, RSI/MACD/ATR strategy',
   },
   {
     icon: (
