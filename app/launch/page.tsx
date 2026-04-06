@@ -4,17 +4,17 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Polymarket Signals is Live on ProductHunt',
   description:
-    'Today we launch Polymarket Signals — AI-powered crypto prediction signals for Polymarket traders. 89% accuracy, 1,200+ signals. Get 30% off with code PHLAUNGH.',
+    'Today we launch Polymarket Signals — AI-powered crypto prediction signals for Polymarket traders. 2.5:1 avg risk:reward, 1,200+ signals. Get 30% off with code PHLAUNGH.',
   openGraph: {
     title: 'Polymarket Signals is Live on ProductHunt',
     description:
-      'AI-powered signals for Polymarket crypto traders. 89% accuracy. 1,200+ signals generated. Get 30% off your first month with code PHLAUNGH.',
+      'AI-powered signals for Polymarket crypto traders. 2.5:1 avg risk:reward. 1,200+ signals generated. Get 30% off your first month with code PHLAUNGH.',
     type: 'website',
   },
 };
 
 const stats = [
-  { value: '89%', label: 'Signal accuracy' },
+  { value: '2.5:1', label: 'Avg Risk:Reward' },
   { value: '1,200+', label: 'Signals generated' },
   { value: '5', label: 'Assets covered' },
   { value: '8AM UTC', label: 'Daily delivery' },
@@ -39,7 +39,7 @@ const keyFeatures = [
     ),
     title: 'Transparent Backtest Data',
     description:
-      '89% directional accuracy over a 6-month backtest on 1,200+ signals. Full methodology published — entry/exit logic, slippage assumptions, and per-asset breakdowns included.',
+      '2.5:1 average risk:reward ratio over a 90-day backtest on 1,200+ signals. Full methodology published — entry/exit logic, RSI/MACD/ATR indicators, and per-asset breakdowns included.',
   },
   {
     icon: (
@@ -54,7 +54,7 @@ const keyFeatures = [
 ];
 
 const TWEET_TEXT = encodeURIComponent(
-  'Just discovered Polymarket Signals — AI-powered signals for Polymarket crypto prediction markets. 89% backtest accuracy, daily delivery. Check it out: https://polymarketsignals.com'
+  'Just discovered Polymarket Signals — AI-powered signals for Polymarket crypto prediction markets. 2.5:1 avg risk:reward ratio, daily delivery. Check it out: https://polymarketsignals.com'
 );
 const TWITTER_SHARE_URL = `https://twitter.com/intent/tweet?text=${TWEET_TEXT}`;
 
@@ -107,7 +107,7 @@ export default function LaunchPage() {
           </p>
 
           <p className="text-base text-gray-500 mb-10">
-            89% accuracy in 6-month backtest &middot; 1,200+ signals generated &middot; Updated 8AM UTC daily
+            2.5:1 avg R:R &middot; 90-day backtest &middot; 1,200+ signals generated &middot; Updated 8AM UTC daily
           </p>
 
           {/* Primary CTA */}
