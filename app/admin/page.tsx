@@ -8,6 +8,7 @@ interface AdminStats {
   active_subscribers: number;
   mrr: number;
   signals_today: number;
+  newsletter_leads: number;
   signals_by_asset: { asset: string; count: number }[];
   recent_users: { id: number; email: string; plan: string; status: string; created_at: string }[];
   recent_signals: Signal[];
@@ -229,6 +230,7 @@ export default function AdminPage() {
               value={stats ? `$${stats.mrr.toLocaleString()}` : '—'}
             />
             <StatCard label="Signals Today" value={stats?.signals_today ?? '—'} />
+            <StatCard label="Email Leads" value={stats?.newsletter_leads ?? '—'} />
           </div>
         </section>
 
