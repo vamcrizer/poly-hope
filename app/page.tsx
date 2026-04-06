@@ -4,6 +4,7 @@ import { Footer } from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { TestimonialCard } from '@/components/TestimonialCard';
 import { LiveSignalTicker } from '@/components/LiveSignalTicker';
+import { NewsletterCapture } from '@/components/NewsletterCapture';
 
 const stats = [
   { value: '2.5:1', label: 'Avg Risk:Reward Ratio' },
@@ -481,6 +482,23 @@ export default function LandingPage() {
                 </Link>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Newsletter Capture */}
+      <section className="py-16 border-y border-gray-800 bg-gray-900/20">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+            <div className="shrink-0">
+              <h3 className="text-lg font-semibold text-white mb-1">Get a free signal preview</h3>
+              <p className="text-sm text-gray-400">
+                See today&apos;s signals before you subscribe — no credit card required.
+              </p>
+            </div>
+            <div className="sm:ml-auto w-full sm:w-auto">
+              <NewsletterCapture />
+            </div>
           </div>
         </div>
       </section>

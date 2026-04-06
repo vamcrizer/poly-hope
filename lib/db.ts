@@ -277,6 +277,31 @@ db.exec(`
   );
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS newsletter_leads (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT UNIQUE NOT NULL,
+    source TEXT DEFAULT 'landing',
+    created_at TEXT DEFAULT (datetime('now'))
+  );
+`);
+
+export function addNewsletterLead(email: string, source = 'landing'): boolean {
+  try {
+    db.prepare('INSERT OR IGNORE INTO newsletter_leads (email, source) VALUES (?, ?)')
+      .run(email.toLowerCase().trim(), source);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function getNewsletterLeads(): { id: number; email: string; source: string; created_at: string }[] {
+  return db.prepare('SELECT * FROM newsletter_leads ORDER BY id DESC LIMIT 500').all() as {
+    id: number; email: string; source: string; created_at: string;
+  }[];
+}
+
 export interface ApiKey {
   id: number;
   user_id: number;
