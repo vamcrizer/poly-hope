@@ -17,6 +17,14 @@ export default function AccountPage() {
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
+  const [openingPortal, setOpeningPortal] = useState(false);
+
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordChanging, setPasswordChanging] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
 
   useEffect(() => {
     fetch('/api/user/me')
@@ -41,6 +49,36 @@ export default function AccountPage() {
     } else {
       alert('Failed to cancel subscription. Please try again.');
       setCancelling(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    setPasswordError('');
+    setPasswordSuccess('');
+    if (newPassword !== confirmPassword) {
+      setPasswordError('New passwords do not match');
+      return;
+    }
+    setPasswordChanging(true);
+    try {
+      const res = await fetch('/api/user/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setPasswordSuccess('Password updated successfully');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        setPasswordError(data.error || 'Failed to update password');
+      }
+    } catch {
+      setPasswordError('An unexpected error occurred');
+    } finally {
+      setPasswordChanging(false);
     }
   };
 
@@ -156,6 +194,57 @@ export default function AccountPage() {
               </div>
             </div>
           )}
+        </div>
+        {/* Change Password */}
+        <div className="rounded-xl border border-gray-800 bg-gray-900/60 p-6">
+          <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">Change Password</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Current password</label>
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                placeholder="••••••••"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">New password</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                placeholder="Min. 8 characters"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Confirm new password</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                placeholder="••••••••"
+              />
+            </div>
+
+            {passwordError && (
+              <p className="text-sm text-red-400">{passwordError}</p>
+            )}
+            {passwordSuccess && (
+              <p className="text-sm text-emerald-400">{passwordSuccess}</p>
+            )}
+
+            <button
+              onClick={handleChangePassword}
+              disabled={passwordChanging || !currentPassword || !newPassword || !confirmPassword}
+              className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium text-white transition-colors"
+            >
+              {passwordChanging ? 'Updating...' : 'Update password'}
+            </button>
+          </div>
         </div>
       </main>
     </div>
