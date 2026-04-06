@@ -15,10 +15,11 @@ export default function SettingsPage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
-  const [emailAlertsEnabled, setEmailAlertsEnabled] = useState(false);
+  const [emailAlertsEnabled, setEmailAlertsEnabled] = useState(true);
+  const [savingEmail, setSavingEmail] = useState(false);
 
   useEffect(() => {
-    fetch('/api/user/telegram')
+    const loadTelegram = fetch('/api/user/telegram')
       .then((res) => {
         if (!res.ok) throw new Error('Failed to load settings');
         return res.json() as Promise<TelegramStatus>;
@@ -27,9 +28,32 @@ export default function SettingsPage() {
         setSavedChatId(data.telegram_chat_id);
         if (data.telegram_chat_id) setChatId(data.telegram_chat_id);
       })
-      .catch(console.error)
-      .finally(() => setLoadingStatus(false));
+      .catch(console.error);
+
+    const loadNotifs = fetch('/api/user/notifications')
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => { if (data) setEmailAlertsEnabled(data.email_alerts_enabled); })
+      .catch(console.error);
+
+    Promise.allSettled([loadTelegram, loadNotifs]).finally(() => setLoadingStatus(false));
   }, []);
+
+  async function handleEmailToggle(enabled: boolean) {
+    setEmailAlertsEnabled(enabled);
+    setSavingEmail(true);
+    try {
+      await fetch('/api/user/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email_alerts_enabled: enabled }),
+      });
+    } catch {
+      // revert on error
+      setEmailAlertsEnabled(!enabled);
+    } finally {
+      setSavingEmail(false);
+    }
+  }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -185,7 +209,8 @@ export default function SettingsPage() {
               type="checkbox"
               className="sr-only"
               checked={emailAlertsEnabled}
-              onChange={(e) => setEmailAlertsEnabled(e.target.checked)}
+              disabled={savingEmail}
+              onChange={(e) => handleEmailToggle(e.target.checked)}
             />
             <div
               className={`w-10 h-6 rounded-full transition-colors ${
@@ -203,8 +228,9 @@ export default function SettingsPage() {
           </span>
         </label>
 
-        <p className="text-xs text-gray-400 mt-3">
-          Full email alert configuration coming soon.
+        <p className="text-xs text-gray-500 mt-3">
+          When enabled, you&apos;ll receive the daily signals digest at 8AM UTC.
+          {savingEmail && <span className="ml-2 text-gray-600">Saving…</span>}
         </p>
       </section>
     </div>

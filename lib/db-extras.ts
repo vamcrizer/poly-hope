@@ -7,6 +7,7 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     telegram_chat_id TEXT,
+    email_alerts_enabled INTEGER NOT NULL DEFAULT 1,
     created_at TEXT DEFAULT (datetime('now'))
   );
 
@@ -26,6 +27,7 @@ export interface UserSettings {
   id: number;
   user_id: number;
   telegram_chat_id: string | null;
+  email_alerts_enabled: number; // SQLite boolean: 1 = true, 0 = false
   created_at: string;
 }
 
@@ -54,21 +56,30 @@ export function getUserSettings(userId: number): UserSettings | undefined {
 
 export function upsertUserSettings(
   userId: number,
-  settings: Partial<Pick<UserSettings, 'telegram_chat_id'>>,
+  settings: Partial<Pick<UserSettings, 'telegram_chat_id' | 'email_alerts_enabled'>>,
 ): void {
   const existing = getUserSettings(userId);
 
   if (existing) {
     db.prepare(`
       UPDATE user_settings SET
-        telegram_chat_id = COALESCE(?, telegram_chat_id)
+        telegram_chat_id = COALESCE(?, telegram_chat_id),
+        email_alerts_enabled = COALESCE(?, email_alerts_enabled)
       WHERE user_id = ?
-    `).run(settings.telegram_chat_id ?? null, userId);
+    `).run(
+      settings.telegram_chat_id ?? null,
+      settings.email_alerts_enabled ?? null,
+      userId,
+    );
   } else {
     db.prepare(`
-      INSERT INTO user_settings (user_id, telegram_chat_id)
-      VALUES (?, ?)
-    `).run(userId, settings.telegram_chat_id ?? null);
+      INSERT INTO user_settings (user_id, telegram_chat_id, email_alerts_enabled)
+      VALUES (?, ?, ?)
+    `).run(
+      userId,
+      settings.telegram_chat_id ?? null,
+      settings.email_alerts_enabled ?? 1,
+    );
   }
 }
 

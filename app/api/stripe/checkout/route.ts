@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { plan } = body as { plan?: Plan };
+    const { plan, promoCode } = body as { plan?: Plan; promoCode?: string };
 
     if (!plan || !['basic', 'pro', 'api'].includes(plan)) {
       return NextResponse.json(
@@ -48,22 +48,35 @@ export async function POST(request: NextRequest) {
     const stripe = new Stripe(stripeSecretKey);
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
-    const checkoutSession = await stripe.checkout.sessions.create({
+    // Build checkout params
+    const checkoutParams: Parameters<typeof stripe.checkout.sessions.create>[0] = {
       mode: 'subscription',
       payment_method_types: ['card'],
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
+      line_items: [{ price: priceId, quantity: 1 }],
       customer_email: session.email,
       success_url: `${appUrl}/dashboard?success=1`,
       cancel_url: `${appUrl}/pricing`,
-      metadata: {
-        userId: String(session.userId),
+      metadata: { userId: String(session.userId) },
+      subscription_data: {
+        trial_period_days: 7,
+        metadata: { userId: String(session.userId) },
       },
-    });
+      // Allow promo codes entered at checkout
+      allow_promotion_codes: !promoCode,
+    };
+
+    // If a specific promo code was passed, look it up and apply it
+    if (promoCode) {
+      const codes = await stripe.promotionCodes.list({ code: promoCode, active: true, limit: 1 });
+      if (codes.data.length > 0) {
+        checkoutParams.discounts = [{ promotion_code: codes.data[0].id }];
+      } else {
+        // Code not found — fall back to allowing any promo code at checkout
+        checkoutParams.allow_promotion_codes = true;
+      }
+    }
+
+    const checkoutSession = await stripe.checkout.sessions.create(checkoutParams);
 
     return NextResponse.json({ url: checkoutSession.url });
   } catch (err) {
