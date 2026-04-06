@@ -1,15 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { formatConfidence, formatPrice, getDirectionBg, calcRiskReward, timeAgo } from '@/lib/utils';
 import { OnboardingChecklist } from '@/components/OnboardingChecklist';
 import { MarketBiasBadge } from '@/components/MarketBiasBadge';
 import { NextSignalCountdown } from '@/components/NextSignalCountdown';
 import type { Signal } from '@/types';
 
-export default function DashboardPage() {
+function DashboardContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isSuccess = searchParams.get('success') === '1';
   const [signals, setSignals] = useState<Signal[]>([]);
   const [generatedAt, setGeneratedAt] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -93,6 +95,22 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Subscription success banner */}
+      {isSuccess && (
+        <div className="mb-6 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-5 flex items-start gap-3">
+          <svg className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <p className="text-sm font-semibold text-emerald-400">Subscription activated!</p>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Welcome aboard. Your first signals will arrive at 8AM UTC. Set up Telegram alerts in{' '}
+              <a href="/dashboard/settings" className="underline hover:text-white">Settings</a> to get notified instantly.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Onboarding checklist */}
       {!loading && !needsUpgrade && !checklistDismissed && (
         <OnboardingChecklist
@@ -327,5 +345,13 @@ export default function DashboardPage() {
         Always do your own research before trading on Polymarket.
       </p>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense>
+      <DashboardContent />
+    </Suspense>
   );
 }
