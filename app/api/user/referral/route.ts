@@ -4,7 +4,7 @@ import { createReferralCode, getReferralStats } from '@/lib/db-extras';
 
 export const dynamic = 'force-dynamic';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://polymarketsignals.com';
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://polymarketsignals.com';
 
 export async function GET(request: NextRequest) {
   const session = await getSession(request);
