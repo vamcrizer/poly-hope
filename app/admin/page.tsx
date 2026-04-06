@@ -12,6 +12,7 @@ interface UtmRow {
 
 interface AdminStats {
   total_users: number;
+  signups_today: number;
   active_subscribers: number;
   mrr: number;
   signals_today: number;
@@ -271,6 +272,7 @@ export default function AdminPage() {
           <h2 className="text-lg font-semibold text-white mb-4">Overview</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard label="Total Users" value={stats?.total_users ?? '—'} />
+            <StatCard label="Signups Today" value={stats?.signups_today ?? '—'} />
             <StatCard label="Active Subscribers" value={stats?.active_subscribers ?? '—'} />
             <StatCard
               label="MRR"

@@ -16,6 +16,13 @@ const guides = [
     readTime: '8 min read',
     tag: 'Beginner',
   },
+  {
+    href: '/guides/what-is-rsi-crypto',
+    title: 'What is RSI in Crypto Trading?',
+    desc: 'Learn how the Relative Strength Index works, what oversold/overbought means, and how RSI drives our LONG/SHORT signals. With practical Polymarket examples.',
+    readTime: '6 min read',
+    tag: 'Technical Analysis',
+  },
 ];
 
 export default function GuidesPage() {

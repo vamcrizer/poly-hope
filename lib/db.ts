@@ -409,6 +409,7 @@ export function getUserByApiKey(keyHash: string): (User & { plan: string; status
 
 export interface AdminStats {
   total_users: number;
+  signups_today: number;
   active_subscribers: number;
   mrr: number;
   signals_today: number;
@@ -420,6 +421,11 @@ export interface AdminStats {
 
 export function getAdminStats(): AdminStats {
   const total_users = (db.prepare('SELECT COUNT(*) AS cnt FROM users').get() as { cnt: number }).cnt;
+
+  const signups_today = (db.prepare(`
+    SELECT COUNT(*) AS cnt FROM users
+    WHERE created_at >= datetime('now', 'start of day')
+  `).get() as { cnt: number }).cnt;
 
   const active_rows = db.prepare(`
     SELECT plan, COUNT(*) AS cnt
@@ -466,6 +472,7 @@ export function getAdminStats(): AdminStats {
 
   return {
     total_users,
+    signups_today,
     active_subscribers,
     mrr,
     signals_today,
