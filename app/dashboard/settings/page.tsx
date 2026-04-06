@@ -17,6 +17,7 @@ export default function SettingsPage() {
   const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
   const [emailAlertsEnabled, setEmailAlertsEnabled] = useState(true);
   const [savingEmail, setSavingEmail] = useState(false);
+  const [minConfidence, setMinConfidence] = useState(0);
   const [slackUrl, setSlackUrl] = useState('');
   const [savedSlackUrl, setSavedSlackUrl] = useState<string | null>(null);
   const [savingSlack, setSavingSlack] = useState(false);
@@ -40,7 +41,7 @@ export default function SettingsPage() {
 
     const loadNotifs = fetch('/api/user/notifications')
       .then((res) => res.ok ? res.json() : null)
-      .then((data) => { if (data) setEmailAlertsEnabled(data.email_alerts_enabled); })
+      .then((data) => { if (data) { setEmailAlertsEnabled(data.email_alerts_enabled); if (typeof data.min_confidence === 'number') setMinConfidence(data.min_confidence); } })
       .catch(console.error);
 
     const loadSlack = fetch('/api/user/slack')
@@ -66,11 +67,19 @@ export default function SettingsPage() {
         body: JSON.stringify({ email_alerts_enabled: enabled }),
       });
     } catch {
-      // revert on error
       setEmailAlertsEnabled(!enabled);
     } finally {
       setSavingEmail(false);
     }
+  }
+
+  async function handleMinConfidenceChange(val: number) {
+    setMinConfidence(val);
+    await fetch('/api/user/notifications', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ min_confidence: val }),
+    }).catch(() => {});
   }
 
   async function handleSaveSlack(e: React.FormEvent) {
@@ -339,6 +348,27 @@ export default function SettingsPage() {
           When enabled, you&apos;ll receive the daily signals digest at 8AM UTC.
           {savingEmail && <span className="ml-2 text-gray-600">Saving…</span>}
         </p>
+
+        {/* Minimum confidence threshold */}
+        <div className="mt-5 pt-5 border-t border-gray-800">
+          <p className="text-sm font-medium text-gray-300 mb-2">Minimum confidence threshold</p>
+          <p className="text-xs text-gray-500 mb-3">Only receive alerts for signals above this confidence level.</p>
+          <div className="flex flex-wrap gap-2">
+            {[0, 0.5, 0.6, 0.7, 0.8].map((v) => (
+              <button
+                key={v}
+                onClick={() => handleMinConfidenceChange(v)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                  minConfidence === v
+                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                    : 'bg-gray-800 text-gray-400 border-gray-700 hover:border-gray-600'
+                }`}
+              >
+                {v === 0 ? 'All signals' : `${v * 100}%+ confidence`}
+              </button>
+            ))}
+          </div>
+        </div>
       </section>
     </div>
   );

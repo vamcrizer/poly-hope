@@ -9,6 +9,7 @@ db.exec(`
     telegram_chat_id TEXT,
     email_alerts_enabled INTEGER NOT NULL DEFAULT 1,
     slack_webhook_url TEXT,
+    min_confidence REAL NOT NULL DEFAULT 0,
     created_at TEXT DEFAULT (datetime('now'))
   );
 
@@ -30,6 +31,7 @@ export interface UserSettings {
   telegram_chat_id: string | null;
   email_alerts_enabled: number; // SQLite boolean: 1 = true, 0 = false
   slack_webhook_url: string | null;
+  min_confidence: number; // 0.0–1.0
   created_at: string;
 }
 
@@ -58,7 +60,7 @@ export function getUserSettings(userId: number): UserSettings | undefined {
 
 export function upsertUserSettings(
   userId: number,
-  settings: Partial<Pick<UserSettings, 'telegram_chat_id' | 'email_alerts_enabled' | 'slack_webhook_url'>>,
+  settings: Partial<Pick<UserSettings, 'telegram_chat_id' | 'email_alerts_enabled' | 'slack_webhook_url' | 'min_confidence'>>,
 ): void {
   const existing = getUserSettings(userId);
 
@@ -67,23 +69,26 @@ export function upsertUserSettings(
       UPDATE user_settings SET
         telegram_chat_id = COALESCE(?, telegram_chat_id),
         email_alerts_enabled = COALESCE(?, email_alerts_enabled),
-        slack_webhook_url = COALESCE(?, slack_webhook_url)
+        slack_webhook_url = COALESCE(?, slack_webhook_url),
+        min_confidence = COALESCE(?, min_confidence)
       WHERE user_id = ?
     `).run(
       settings.telegram_chat_id ?? null,
       settings.email_alerts_enabled ?? null,
       settings.slack_webhook_url ?? null,
+      settings.min_confidence ?? null,
       userId,
     );
   } else {
     db.prepare(`
-      INSERT INTO user_settings (user_id, telegram_chat_id, email_alerts_enabled, slack_webhook_url)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO user_settings (user_id, telegram_chat_id, email_alerts_enabled, slack_webhook_url, min_confidence)
+      VALUES (?, ?, ?, ?, ?)
     `).run(
       userId,
       settings.telegram_chat_id ?? null,
       settings.email_alerts_enabled ?? 1,
       settings.slack_webhook_url ?? null,
+      settings.min_confidence ?? 0,
     );
   }
 }
