@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { formatConfidence, formatPrice, getDirectionBg, calcRiskReward, timeAgo } from '@/lib/utils';
 import type { Signal } from '@/types';
 
-export default function DashboardPage() {
+function DashboardContent() {
   const router = useRouter();
   const [signals, setSignals] = useState<Signal[]>([]);
   const [generatedAt, setGeneratedAt] = useState<string>('');
