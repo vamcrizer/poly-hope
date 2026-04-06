@@ -164,7 +164,7 @@ export default function LandingPage() {
               </svg>
             </Link>
             <Link
-              href="/dashboard"
+              href="/preview"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold text-gray-300 hover:text-white bg-gray-800/60 hover:bg-gray-800 rounded-xl border border-gray-700 hover:border-gray-600 transition-all duration-150"
             >
               View Live Signals

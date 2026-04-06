@@ -17,6 +17,21 @@ interface Release {
 
 const releases: Release[] = [
   {
+    version: 'v1.2.0',
+    date: 'April 2026',
+    label: 'Latest',
+    status: 'released',
+    changes: [
+      { text: 'Signal performance tracking dashboard with win rate + P&L history' },
+      { text: 'Webhook delivery with HMAC-SHA256 signing and 3× retry' },
+      { text: 'Telegram personal alerts — connect your chat ID in Settings' },
+      { text: 'Referral program — earn credit for every subscriber you bring in' },
+      { text: 'REST API v1 with sliding-window rate limiting (1,000 req/day)' },
+      { text: 'Embeddable widget — paste one line of code to show signals on your site' },
+      { text: 'Volume surge detection for higher-confidence signal entries' },
+    ],
+  },
+  {
     version: 'v1.0.0',
     date: 'April 2026',
     status: 'released',
@@ -30,13 +45,14 @@ const releases: Release[] = [
     ],
   },
   {
-    version: 'v1.1.0',
+    version: 'v1.3.0',
     date: 'Expected May 2026',
     status: 'upcoming',
     changes: [
-      { text: 'Telegram alerts', badge: 'Coming Soon' },
-      { text: 'Webhook delivery for API subscribers', badge: 'Coming Soon' },
       { text: 'More assets — BNB, AVAX, LINK', badge: 'Coming Soon' },
+      { text: 'Custom alert thresholds per asset', badge: 'Coming Soon' },
+      { text: 'Slack integration for team signal delivery', badge: 'Coming Soon' },
+      { text: 'Multi-timeframe signal aggregation (1h, 4h)', badge: 'Coming Soon' },
     ],
   },
 ];

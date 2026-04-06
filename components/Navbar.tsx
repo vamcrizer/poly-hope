@@ -28,16 +28,22 @@ export function Navbar() {
               Features
             </Link>
             <Link
+              href="/preview"
+              className="px-4 py-2 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-gray-800/50 transition-all duration-150"
+            >
+              Live Signals
+            </Link>
+            <Link
               href="/pricing"
               className="px-4 py-2 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-gray-800/50 transition-all duration-150"
             >
               Pricing
             </Link>
             <Link
-              href="/dashboard"
+              href="/docs"
               className="px-4 py-2 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-gray-800/50 transition-all duration-150"
             >
-              Dashboard
+              API Docs
             </Link>
           </nav>
 
@@ -86,6 +92,13 @@ export function Navbar() {
               Features
             </Link>
             <Link
+              href="/preview"
+              onClick={() => setMenuOpen(false)}
+              className="flex items-center px-4 py-2.5 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all"
+            >
+              Live Signals
+            </Link>
+            <Link
               href="/pricing"
               onClick={() => setMenuOpen(false)}
               className="flex items-center px-4 py-2.5 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all"
@@ -93,11 +106,11 @@ export function Navbar() {
               Pricing
             </Link>
             <Link
-              href="/dashboard"
+              href="/docs"
               onClick={() => setMenuOpen(false)}
               className="flex items-center px-4 py-2.5 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all"
             >
-              Dashboard
+              API Docs
             </Link>
             <div className="pt-2 flex flex-col gap-2 px-4">
               <Link
