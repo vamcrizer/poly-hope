@@ -7,6 +7,8 @@ import type { Signal } from '@/types';
 
 function DashboardContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const justSubscribed = searchParams.get('success') === '1';
   const [signals, setSignals] = useState<Signal[]>([]);
   const [generatedAt, setGeneratedAt] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -14,6 +16,7 @@ function DashboardContent() {
   const [needsUpgrade, setNeedsUpgrade] = useState(false);
   const [userEmail, setUserEmail] = useState<string>('');
   const [copiedAsset, setCopiedAsset] = useState<string | null>(null);
+  const [showWelcome, setShowWelcome] = useState(justSubscribed);
 
   function buildShareUrl(signal: Signal): string {
     const base = typeof window !== 'undefined' ? window.location.origin : 'https://polymarketsignals.com';
@@ -293,5 +296,13 @@ function DashboardContent() {
         </p>
       </main>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense>
+      <DashboardContent />
+    </Suspense>
   );
 }
