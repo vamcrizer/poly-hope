@@ -12,9 +12,21 @@ export const metadata: Metadata = {
   },
 };
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'What is MACD in Crypto Trading? | Polymarket Signals Guide',
+  description: 'Learn how the MACD indicator works in crypto trading. Understand bullish/bearish crossovers, MACD divergence, and how MACD confirms RSI signals for higher-confidence trades.',
+  author: { '@type': 'Organization', name: 'Polymarket Signals' },
+  publisher: { '@type': 'Organization', name: 'Polymarket Signals', logo: { '@type': 'ImageObject', url: 'https://polymarketsignals.com/icon-192.png' } },
+  datePublished: '2026-04-06',
+  dateModified: '2026-04-06',
+};
+
 export default function MacdGuidePage() {
   return (
     <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Navbar />
 
       <main className="flex-1 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

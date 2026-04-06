@@ -8,6 +8,15 @@ export const metadata: Metadata = {
   description: 'Free guides on trading Polymarket crypto prediction markets. Learn RSI, MACD, ATR, and how to use trading signals to find edge on Polymarket.',
 };
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://polymarketsignals.com' },
+    { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://polymarketsignals.com/guides' },
+  ],
+};
+
 const guides = [
   {
     href: '/guides/how-to-trade-polymarket-crypto',
@@ -44,11 +53,33 @@ const guides = [
     readTime: '6 min read',
     tag: 'Technical Analysis',
   },
+  {
+    href: '/guides/what-is-polymarket',
+    title: 'What is Polymarket? A Complete Guide',
+    desc: 'Learn how Polymarket works, how to deposit USDC, types of crypto prediction markets, and how to find edge using technical analysis signals.',
+    readTime: '7 min read',
+    tag: 'Polymarket Basics',
+  },
+  {
+    href: '/guides/best-polymarket-crypto-markets',
+    title: 'Best Crypto Markets to Trade on Polymarket',
+    desc: 'Compare BTC, ETH, SOL, XRP, and DOGE markets by liquidity, signal quality, and spread. Which assets produce the most reliable trading signals?',
+    readTime: '6 min read',
+    tag: 'Polymarket Basics',
+  },
+  {
+    href: '/guides/how-to-read-polymarket-signals',
+    title: 'How to Read a Polymarket Signal',
+    desc: 'What every signal field means — direction, confidence, entry, stop loss, take profit — and how to find the right Polymarket market to trade it on.',
+    readTime: '5 min read',
+    tag: 'Beginner',
+  },
 ];
 
 export default function GuidesPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Navbar />
 
       <main className="flex-1 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

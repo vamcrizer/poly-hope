@@ -108,9 +108,24 @@ const sections = [
   },
 ];
 
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    { '@type': 'Question', name: 'What exactly is a "Polymarket signal"?', acceptedAnswer: { '@type': 'Answer', text: 'A signal is a daily trading recommendation including direction (LONG or SHORT), confidence score, entry price, stop loss, and take profit. Generated at 8AM UTC.' } },
+    { '@type': 'Question', name: 'Which assets do you cover?', acceptedAnswer: { '@type': 'Answer', text: 'BTC, ETH, SOL, XRP, and DOGE — the 5 most liquid crypto prediction markets on Polymarket.' } },
+    { '@type': 'Question', name: 'How are signals generated?', acceptedAnswer: { '@type': 'Answer', text: 'RSI (14-period) for direction, MACD for momentum confirmation, and Bollinger Bands for position scoring. ATR sets stop loss and take profit.' } },
+    { '@type': 'Question', name: 'What is the confidence score?', acceptedAnswer: { '@type': 'Answer', text: 'A normalized 55–85% score reflecting how strongly RSI, MACD, and Bollinger Bands agree on the direction.' } },
+    { '@type': 'Question', name: 'What is included in the free trial?', acceptedAnswer: { '@type': 'Answer', text: '7 days of full access with no credit card required. Daily signals, Telegram alerts, CSV export.' } },
+    { '@type': 'Question', name: 'Can I cancel anytime?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. Cancel from account settings. Access continues until end of billing period.' } },
+    { '@type': 'Question', name: 'Is this financial advice?', acceptedAnswer: { '@type': 'Answer', text: 'No. Polymarket Signals provides technical analysis tools. Nothing constitutes financial advice or a recommendation to buy or sell.' } },
+  ],
+};
+
 export default function FaqPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <Navbar />
 
       <main className="flex-1 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

@@ -12,9 +12,21 @@ export const metadata: Metadata = {
   },
 };
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'What is ATR in Crypto Trading? | Polymarket Signals Guide',
+  description: 'Learn how Average True Range (ATR) measures volatility in crypto markets. Understand how to use ATR for stop loss and take profit placement, and why 2.5:1 risk-reward works.',
+  author: { '@type': 'Organization', name: 'Polymarket Signals' },
+  publisher: { '@type': 'Organization', name: 'Polymarket Signals', logo: { '@type': 'ImageObject', url: 'https://polymarketsignals.com/icon-192.png' } },
+  datePublished: '2026-04-06',
+  dateModified: '2026-04-06',
+};
+
 export default function AtrGuidePage() {
   return (
     <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Navbar />
 
       <main className="flex-1 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
