@@ -24,14 +24,14 @@ export async function POST(request: NextRequest) {
 
   // Get all users with telegram connected
   const usersWithTelegram = db.prepare(`
-    SELECT u.id, u.email, us.telegram_chat_id, us.email_alerts_enabled
+    SELECT u.id, u.email, us.telegram_chat_id, us.email_alerts_enabled, COALESCE(us.min_confidence, 0) AS min_confidence
     FROM users u
     JOIN user_settings us ON us.user_id = u.id
     JOIN subscriptions s ON s.user_id = u.id
     WHERE us.telegram_chat_id IS NOT NULL
     AND s.status = 'active'
     AND (us.email_alerts_enabled IS NULL OR us.email_alerts_enabled = 1)
-  `).all() as Array<{ id: number; email: string; telegram_chat_id: string; email_alerts_enabled: number }>;
+  `).all() as Array<{ id: number; email: string; telegram_chat_id: string; email_alerts_enabled: number; min_confidence: number }>;
 
   let sent = 0;
   let errors = 0;
@@ -39,7 +39,12 @@ export async function POST(request: NextRequest) {
   await Promise.allSettled(
     usersWithTelegram.map(async (user) => {
       try {
-        await sendSignalsDigest(user.telegram_chat_id, signals);
+        // Apply user's minimum confidence filter
+        const filtered = user.min_confidence > 0
+          ? signals.filter((s) => s.confidence >= user.min_confidence)
+          : signals;
+        if (filtered.length === 0) return;
+        await sendSignalsDigest(user.telegram_chat_id, filtered);
         sent++;
       } catch {
         errors++;
