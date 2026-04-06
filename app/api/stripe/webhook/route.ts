@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { upsertSubscription } from '@/lib/db';
+import { upsertSubscription, getUser } from '@/lib/db';
+import { getUserSettings } from '@/lib/db-extras';
+import { sendMessage } from '@/lib/telegram';
 
 export const dynamic = 'force-dynamic';
 
@@ -115,6 +117,23 @@ export async function POST(request: NextRequest) {
           userId: Number(userId),
           status: 'past_due',
         });
+        break;
+      }
+
+      case 'customer.subscription.trial_will_end': {
+        // Trial ending in 3 days — send Telegram reminder if connected
+        const subscription = event.data.object as Stripe.Subscription;
+        const userId = subscription.metadata?.userId;
+        if (!userId) break;
+
+        const settings = getUserSettings(Number(userId));
+        if (settings?.telegram_chat_id) {
+          const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://polymarketsignals.com';
+          await sendMessage(
+            settings.telegram_chat_id,
+            `⏰ *Your Polymarket Signals free trial ends in 3 days!*\n\nTo keep receiving daily signals, your subscription will automatically activate.\n\n[Manage billing](${appUrl}/billing)`
+          ).catch(() => {});
+        }
         break;
       }
 
