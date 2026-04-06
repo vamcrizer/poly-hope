@@ -48,6 +48,19 @@ export default function WebhooksPage() {
   // Delete state
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  // Delivery history
+  interface DeliveryRecord {
+    id: number;
+    webhook_id: number;
+    event: string;
+    status: 'success' | 'failed';
+    http_status: number | null;
+    duration_ms: number | null;
+    delivered_at: string;
+  }
+  const [deliveries, setDeliveries] = useState<DeliveryRecord[]>([]);
+  const [deliveriesLoading, setDeliveriesLoading] = useState(false);
+
   useEffect(() => {
     fetch('/api/user/subscription')
       .then((r) => (r.ok ? r.json() : null))
@@ -59,6 +72,12 @@ export default function WebhooksPage() {
   useEffect(() => {
     if (sub && sub.status === 'active' && ['pro', 'api'].includes(sub.plan)) {
       loadWebhooks();
+      setDeliveriesLoading(true);
+      fetch('/api/webhooks/deliveries')
+        .then((r) => r.ok ? r.json() : { deliveries: [] })
+        .then((d) => setDeliveries(d.deliveries ?? []))
+        .catch(() => {})
+        .finally(() => setDeliveriesLoading(false));
     } else {
       setListLoading(false);
     }
@@ -413,6 +432,60 @@ function verify(secret, rawBody, header) {
           </div>
         )}
       </section>
+
+      {/* Delivery History */}
+      {sub && sub.status === 'active' && ['pro', 'api'].includes(sub.plan) && (
+        <section>
+          <h2 className="text-sm font-semibold text-white mb-3">Recent Deliveries</h2>
+          {deliveriesLoading ? (
+            <div className="space-y-2">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-10 rounded-lg bg-gray-800/50 animate-pulse" />
+              ))}
+            </div>
+          ) : deliveries.length === 0 ? (
+            <div className="rounded-xl border border-gray-800 bg-gray-900/40 px-5 py-6 text-center">
+              <p className="text-sm text-gray-500">No deliveries yet. Register a webhook to get started.</p>
+            </div>
+          ) : (
+            <div className="rounded-xl border border-gray-800 overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-800 bg-gray-900/60">
+                    <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-400">Event</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-400">Status</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-400 hidden sm:table-cell">HTTP</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-400 hidden sm:table-cell">Duration</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-400">Time</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-800/50">
+                  {deliveries.map((d) => (
+                    <tr key={d.id} className="bg-gray-900/30 hover:bg-gray-800/30 transition-colors">
+                      <td className="px-4 py-2.5 font-mono text-xs text-gray-300">{d.event}</td>
+                      <td className="px-4 py-2.5">
+                        <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${d.status === 'success' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${d.status === 'success' ? 'bg-emerald-400' : 'bg-red-400'}`} />
+                          {d.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2.5 text-xs text-gray-400 hidden sm:table-cell">
+                        {d.http_status ?? '—'}
+                      </td>
+                      <td className="px-4 py-2.5 text-xs text-gray-400 hidden sm:table-cell">
+                        {d.duration_ms != null ? `${d.duration_ms}ms` : '—'}
+                      </td>
+                      <td className="px-4 py-2.5 text-xs text-gray-500">
+                        {new Date(d.delivered_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      )}
     </div>
   );
 }
