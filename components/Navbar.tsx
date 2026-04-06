@@ -40,6 +40,12 @@ export function Navbar() {
               Pricing
             </Link>
             <Link
+              href="/faq"
+              className="px-4 py-2 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-gray-800/50 transition-all duration-150"
+            >
+              FAQ
+            </Link>
+            <Link
               href="/docs"
               className="px-4 py-2 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-gray-800/50 transition-all duration-150"
             >
@@ -104,6 +110,13 @@ export function Navbar() {
               className="flex items-center px-4 py-2.5 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all"
             >
               Pricing
+            </Link>
+            <Link
+              href="/faq"
+              onClick={() => setMenuOpen(false)}
+              className="flex items-center px-4 py-2.5 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all"
+            >
+              FAQ
             </Link>
             <Link
               href="/docs"

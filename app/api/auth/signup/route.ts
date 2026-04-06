@@ -4,6 +4,7 @@ import { createUser, getUser, upsertSubscription } from '@/lib/db';
 import { signToken, setSessionCookie } from '@/lib/auth';
 import { applyReferral } from '@/lib/db-extras';
 import { sendWelcomeEmail } from '@/lib/email';
+import { checkSignupRateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,6 +12,16 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit by IP
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? request.headers.get('x-real-ip') ?? 'unknown';
+    const rl = checkSignupRateLimit(ip);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Too many signup attempts. Please try again later.' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const refCode = searchParams.get('ref');
 

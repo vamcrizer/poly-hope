@@ -62,3 +62,26 @@ export function getRateLimitHeaders(result: RateLimitResult): Record<string, str
     'X-RateLimit-Reset': String(Math.ceil(result.resetAt / 1000)),
   };
 }
+
+// ── Signup rate limiter (per IP, 5 signups per hour) ─────────────────────────
+
+const SIGNUP_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const SIGNUP_MAX = 5;
+const signupStore = new Map<string, RateLimitEntry>();
+
+export function checkSignupRateLimit(ip: string): RateLimitResult {
+  const now = Date.now();
+  const entry = signupStore.get(ip);
+
+  if (!entry || now - entry.windowStart > SIGNUP_WINDOW_MS) {
+    signupStore.set(ip, { count: 1, windowStart: now });
+    return { allowed: true, remaining: SIGNUP_MAX - 1, limit: SIGNUP_MAX, resetAt: now + SIGNUP_WINDOW_MS };
+  }
+
+  if (entry.count >= SIGNUP_MAX) {
+    return { allowed: false, remaining: 0, limit: SIGNUP_MAX, resetAt: entry.windowStart + SIGNUP_WINDOW_MS };
+  }
+
+  entry.count += 1;
+  return { allowed: true, remaining: SIGNUP_MAX - entry.count, limit: SIGNUP_MAX, resetAt: entry.windowStart + SIGNUP_WINDOW_MS };
+}
