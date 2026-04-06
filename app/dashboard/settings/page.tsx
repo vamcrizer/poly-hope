@@ -17,6 +17,14 @@ export default function SettingsPage() {
   const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
   const [emailAlertsEnabled, setEmailAlertsEnabled] = useState(true);
   const [savingEmail, setSavingEmail] = useState(false);
+  const [slackUrl, setSlackUrl] = useState('');
+  const [savedSlackUrl, setSavedSlackUrl] = useState<string | null>(null);
+  const [savingSlack, setSavingSlack] = useState(false);
+  const [slackError, setSlackError] = useState<string | null>(null);
+  const [slackSuccess, setSlackSuccess] = useState(false);
+  const [testingSlack, setTestingSlack] = useState(false);
+  const [slackTestResult, setSlackTestResult] = useState<boolean | null>(null);
+  const [canUseSlack, setCanUseSlack] = useState(false);
 
   useEffect(() => {
     const loadTelegram = fetch('/api/user/telegram')
@@ -35,7 +43,17 @@ export default function SettingsPage() {
       .then((data) => { if (data) setEmailAlertsEnabled(data.email_alerts_enabled); })
       .catch(console.error);
 
-    Promise.allSettled([loadTelegram, loadNotifs]).finally(() => setLoadingStatus(false));
+    const loadSlack = fetch('/api/user/slack')
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => { if (data?.slack_webhook_url) { setSavedSlackUrl(data.slack_webhook_url); setSlackUrl(data.slack_webhook_url); } })
+      .catch(console.error);
+
+    const loadSub = fetch('/api/user/subscription')
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => { if (data && ['pro', 'api'].includes(data.plan) && data.status === 'active') setCanUseSlack(true); })
+      .catch(console.error);
+
+    Promise.allSettled([loadTelegram, loadNotifs, loadSlack, loadSub]).finally(() => setLoadingStatus(false));
   }, []);
 
   async function handleEmailToggle(enabled: boolean) {
@@ -53,6 +71,35 @@ export default function SettingsPage() {
     } finally {
       setSavingEmail(false);
     }
+  }
+
+  async function handleSaveSlack(e: React.FormEvent) {
+    e.preventDefault();
+    setSavingSlack(true);
+    setSlackError(null);
+    setSlackSuccess(false);
+    try {
+      const res = await fetch('/api/user/slack', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slack_webhook_url: slackUrl }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setSlackError(data.error || 'Failed to save'); }
+      else { setSavedSlackUrl(slackUrl); setSlackSuccess(true); setTimeout(() => setSlackSuccess(false), 3000); }
+    } catch { setSlackError('Network error'); }
+    finally { setSavingSlack(false); }
+  }
+
+  async function handleTestSlack() {
+    setTestingSlack(true);
+    setSlackTestResult(null);
+    try {
+      const res = await fetch('/api/user/slack', { method: 'PUT' });
+      const data = await res.json();
+      setSlackTestResult(data.success === true);
+    } catch { setSlackTestResult(false); }
+    finally { setTestingSlack(false); }
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -197,6 +244,66 @@ export default function SettingsPage() {
       </section>
 
       {/* Email Preferences */}
+      {/* Slack integration */}
+      <section className="rounded-xl border border-gray-800 bg-gray-900/60 p-6 shadow-lg">
+        <div className="flex items-start justify-between mb-1">
+          <h2 className="text-lg font-semibold text-white">Slack Alerts</h2>
+          {!canUseSlack && (
+            <a href="/pricing" className="text-xs text-emerald-400 border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+              Pro / API only
+            </a>
+          )}
+        </div>
+        <p className="text-sm text-gray-500 mb-5">
+          Receive signal alerts directly in your Slack channel via incoming webhook.
+        </p>
+
+        {canUseSlack ? (
+          <form onSubmit={handleSaveSlack} className="space-y-4">
+            <div>
+              <label className="block text-xs text-gray-400 mb-1.5">Slack Incoming Webhook URL</label>
+              <input
+                type="url"
+                value={slackUrl}
+                onChange={(e) => setSlackUrl(e.target.value)}
+                placeholder="https://hooks.slack.com/services/..."
+                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-mono text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
+              />
+            </div>
+            {slackError && <p className="text-xs text-red-400">{slackError}</p>}
+            {slackSuccess && <p className="text-xs text-emerald-400">Saved successfully!</p>}
+            <div className="flex items-center gap-3">
+              <button
+                type="submit"
+                disabled={savingSlack}
+                className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium transition-colors disabled:opacity-50"
+              >
+                {savingSlack ? 'Saving...' : 'Save'}
+              </button>
+              {savedSlackUrl && (
+                <button
+                  type="button"
+                  onClick={handleTestSlack}
+                  disabled={testingSlack}
+                  className="px-4 py-2 rounded-lg border border-gray-700 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm transition-colors disabled:opacity-50"
+                >
+                  {testingSlack ? 'Testing...' : 'Test'}
+                </button>
+              )}
+              {slackTestResult !== null && (
+                <span className={`text-xs ${slackTestResult ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {slackTestResult ? '✓ Delivered' : '✗ Failed'}
+                </span>
+              )}
+            </div>
+          </form>
+        ) : (
+          <a href="/pricing" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-sm hover:bg-emerald-500/20 transition-colors">
+            Upgrade to Pro to enable Slack alerts →
+          </a>
+        )}
+      </section>
+
       <section className="rounded-xl border border-gray-800 bg-gray-900/60 p-6 shadow-lg">
         <h2 className="text-lg font-semibold text-white mb-1">Email Preferences</h2>
         <p className="text-sm text-gray-500 mb-5">

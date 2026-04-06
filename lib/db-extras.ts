@@ -8,6 +8,7 @@ db.exec(`
     user_id INTEGER UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     telegram_chat_id TEXT,
     email_alerts_enabled INTEGER NOT NULL DEFAULT 1,
+    slack_webhook_url TEXT,
     created_at TEXT DEFAULT (datetime('now'))
   );
 
@@ -28,6 +29,7 @@ export interface UserSettings {
   user_id: number;
   telegram_chat_id: string | null;
   email_alerts_enabled: number; // SQLite boolean: 1 = true, 0 = false
+  slack_webhook_url: string | null;
   created_at: string;
 }
 
@@ -56,7 +58,7 @@ export function getUserSettings(userId: number): UserSettings | undefined {
 
 export function upsertUserSettings(
   userId: number,
-  settings: Partial<Pick<UserSettings, 'telegram_chat_id' | 'email_alerts_enabled'>>,
+  settings: Partial<Pick<UserSettings, 'telegram_chat_id' | 'email_alerts_enabled' | 'slack_webhook_url'>>,
 ): void {
   const existing = getUserSettings(userId);
 
@@ -64,21 +66,24 @@ export function upsertUserSettings(
     db.prepare(`
       UPDATE user_settings SET
         telegram_chat_id = COALESCE(?, telegram_chat_id),
-        email_alerts_enabled = COALESCE(?, email_alerts_enabled)
+        email_alerts_enabled = COALESCE(?, email_alerts_enabled),
+        slack_webhook_url = COALESCE(?, slack_webhook_url)
       WHERE user_id = ?
     `).run(
       settings.telegram_chat_id ?? null,
       settings.email_alerts_enabled ?? null,
+      settings.slack_webhook_url ?? null,
       userId,
     );
   } else {
     db.prepare(`
-      INSERT INTO user_settings (user_id, telegram_chat_id, email_alerts_enabled)
-      VALUES (?, ?, ?)
+      INSERT INTO user_settings (user_id, telegram_chat_id, email_alerts_enabled, slack_webhook_url)
+      VALUES (?, ?, ?, ?)
     `).run(
       userId,
       settings.telegram_chat_id ?? null,
       settings.email_alerts_enabled ?? 1,
+      settings.slack_webhook_url ?? null,
     );
   }
 }
