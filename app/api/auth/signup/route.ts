@@ -14,7 +14,14 @@ export async function POST(request: NextRequest) {
     const refCode = searchParams.get('ref');
 
     const body = await request.json();
-    const { email, password } = body as { email?: string; password?: string };
+    const { email, password, utmSource, utmMedium, utmCampaign, refCode: bodyRefCode } = body as {
+      email?: string;
+      password?: string;
+      utmSource?: string;
+      utmMedium?: string;
+      utmCampaign?: string;
+      refCode?: string;
+    };
 
     // Validate input
     if (!email || !password) {
@@ -60,10 +67,16 @@ export async function POST(request: NextRequest) {
       status: 'inactive',
     });
 
+    // Log UTM params for analytics (non-blocking)
+    const effectiveRefCode = bodyRefCode?.trim() || refCode?.trim() || null;
+    if (utmSource || utmMedium || utmCampaign) {
+      console.info(`[signup] UTM — source:${utmSource ?? ''} medium:${utmMedium ?? ''} campaign:${utmCampaign ?? ''} user:${user.id}`);
+    }
+
     // Apply referral if a valid ref code was provided
-    if (refCode && refCode.trim().length > 0) {
+    if (effectiveRefCode && effectiveRefCode.length > 0) {
       try {
-        applyReferral(refCode.trim(), user.id);
+        applyReferral(effectiveRefCode, user.id);
       } catch (refErr) {
         // Non-fatal: log and continue
         console.warn('[signup] applyReferral error:', refErr);

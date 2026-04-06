@@ -346,6 +346,7 @@ export interface AdminStats {
   active_subscribers: number;
   mrr: number;
   signals_today: number;
+  newsletter_leads: number;
   signals_by_asset: { asset: string; count: number }[];
   recent_users: { id: number; email: string; plan: string; status: string; created_at: string }[];
   recent_signals: Signal[];
@@ -374,6 +375,8 @@ export function getAdminStats(): AdminStats {
     WHERE generated_at >= datetime('now', 'start of day')
   `).get() as { cnt: number }).cnt;
 
+  const newsletter_leads = (db.prepare('SELECT COUNT(*) AS cnt FROM newsletter_leads').get() as { cnt: number }).cnt;
+
   const signals_by_asset = db.prepare(`
     SELECT asset, COUNT(*) AS count
     FROM signals_cache
@@ -400,6 +403,7 @@ export function getAdminStats(): AdminStats {
     active_subscribers,
     mrr,
     signals_today,
+    newsletter_leads,
     signals_by_asset,
     recent_users,
     recent_signals,

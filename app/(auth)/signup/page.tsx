@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
@@ -13,8 +13,9 @@ interface FieldErrors {
   confirmPassword?: string;
 }
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -59,10 +60,15 @@ export default function SignupPage() {
 
     setLoading(true);
     try {
+      const utmSource = searchParams.get('utm_source') ?? undefined;
+      const utmMedium = searchParams.get('utm_medium') ?? undefined;
+      const utmCampaign = searchParams.get('utm_campaign') ?? undefined;
+      const refCode = searchParams.get('ref') ?? undefined;
+
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, utmSource, utmMedium, utmCampaign, refCode }),
       });
 
       const data = await res.json();
@@ -227,5 +233,13 @@ export default function SignupPage() {
         </p>
       </CardFooter>
     </Card>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense>
+      <SignupForm />
+    </Suspense>
   );
 }
