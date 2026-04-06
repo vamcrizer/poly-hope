@@ -28,6 +28,17 @@ db.exec(`
     status TEXT NOT NULL DEFAULT 'active',
     created_at TEXT DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS webhook_deliveries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    webhook_id INTEGER NOT NULL REFERENCES webhooks(id) ON DELETE CASCADE,
+    event TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    http_status INTEGER,
+    duration_ms INTEGER,
+    error TEXT,
+    delivered_at TEXT DEFAULT (datetime('now'))
+  );
 `);
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -48,6 +59,17 @@ export interface Webhook {
   secret: string;
   status: 'active' | 'inactive';
   created_at: string;
+}
+
+export interface WebhookDelivery {
+  id: number;
+  webhook_id: number;
+  event: string;
+  status: 'success' | 'failed';
+  http_status: number | null;
+  duration_ms: number | null;
+  error: string | null;
+  delivered_at: string;
 }
 
 interface WebhookRow {
@@ -123,6 +145,44 @@ function rowToWebhook(row: WebhookRow): Webhook {
   };
 }
 
+// ─── Delivery log ─────────────────────────────────────────────────────────────
+
+function logDelivery(
+  webhookId: number,
+  event: string,
+  status: 'success' | 'failed',
+  httpStatus: number | null,
+  durationMs: number | null,
+  error?: string
+): void {
+  try {
+    db.prepare(`
+      INSERT INTO webhook_deliveries (webhook_id, event, status, http_status, duration_ms, error)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(webhookId, event, status, httpStatus ?? null, durationMs ?? null, error ?? null);
+  } catch {
+    // Non-critical — don't throw
+  }
+}
+
+export function getDeliveryHistory(webhookId: number, limit = 20): WebhookDelivery[] {
+  return db
+    .prepare(`SELECT * FROM webhook_deliveries WHERE webhook_id = ? ORDER BY id DESC LIMIT ?`)
+    .all(webhookId, limit) as WebhookDelivery[];
+}
+
+export function getDeliveryHistoryForUser(userId: number, limit = 50): WebhookDelivery[] {
+  return db
+    .prepare(`
+      SELECT wd.* FROM webhook_deliveries wd
+      JOIN webhooks w ON w.id = wd.webhook_id
+      WHERE w.user_id = ?
+      ORDER BY wd.id DESC
+      LIMIT ?
+    `)
+    .all(userId, limit) as WebhookDelivery[];
+}
+
 // ─── Delivery ─────────────────────────────────────────────────────────────────
 
 function signPayload(body: string, secret: string): string {
@@ -158,12 +218,14 @@ async function attemptDelivery(
 export async function deliverWebhook(
   url: string,
   payload: WebhookPayload,
-  secret?: string
+  secret?: string,
+  webhookId?: number
 ): Promise<boolean> {
   const body = JSON.stringify(payload);
   const sig = secret ? signPayload(body, secret) : '';
 
   const delays = [0, 1000, 2000, 4000];
+  const startTime = Date.now();
 
   for (let attempt = 0; attempt < 3; attempt++) {
     if (delays[attempt] > 0) {
@@ -171,9 +233,17 @@ export async function deliverWebhook(
     }
 
     const result = await attemptDelivery(url, body, sig);
-    if (result.ok) return true;
+    if (result.ok) {
+      if (webhookId) {
+        logDelivery(webhookId, payload.event, 'success', result.status ?? null, Date.now() - startTime);
+      }
+      return true;
+    }
   }
 
+  if (webhookId) {
+    logDelivery(webhookId, payload.event, 'failed', null, Date.now() - startTime, 'Max retries exceeded');
+  }
   return false;
 }
 
@@ -193,7 +263,7 @@ export async function deliverToAllSubscribers(signals: SignalLike[]): Promise<vo
     rows.map((row) => {
       const webhook = rowToWebhook(row);
       if (!webhook.events.includes('signal.generated')) return Promise.resolve(false);
-      return deliverWebhook(webhook.url, payload, webhook.secret);
+      return deliverWebhook(webhook.url, payload, webhook.secret, webhook.id);
     })
   );
 }
