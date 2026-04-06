@@ -153,11 +153,11 @@ export function getLatestSignals(): Signal[] {
     SELECT s.*
     FROM signals_cache s
     INNER JOIN (
-      SELECT asset, MAX(generated_at) AS max_generated_at
+      SELECT asset, MAX(id) AS max_id
       FROM signals_cache
       WHERE generated_at >= datetime('now', '-24 hours')
       GROUP BY asset
-    ) latest ON s.asset = latest.asset AND s.generated_at = latest.max_generated_at
+    ) latest ON s.id = latest.max_id
     ORDER BY s.asset ASC
   `).all() as Signal[];
 }
