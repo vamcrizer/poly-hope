@@ -13,6 +13,27 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [needsUpgrade, setNeedsUpgrade] = useState(false);
   const [userEmail, setUserEmail] = useState<string>('');
+  const [copiedAsset, setCopiedAsset] = useState<string | null>(null);
+
+  function buildShareUrl(signal: Signal): string {
+    const base = typeof window !== 'undefined' ? window.location.origin : 'https://polymarketsignals.com';
+    const params = new URLSearchParams({
+      asset: signal.asset,
+      dir: signal.direction,
+      conf: String(signal.confidence),
+      ...(signal.entry_price ? { entry: String(signal.entry_price) } : {}),
+      ...(signal.stop_loss ? { sl: String(signal.stop_loss) } : {}),
+      ...(signal.take_profit ? { tp: String(signal.take_profit) } : {}),
+    });
+    return `${base}/signal?${params.toString()}`;
+  }
+
+  async function handleShare(signal: Signal) {
+    const url = buildShareUrl(signal);
+    await navigator.clipboard.writeText(url);
+    setCopiedAsset(signal.asset);
+    setTimeout(() => setCopiedAsset(null), 2000);
+  }
 
   useEffect(() => {
     fetch('/api/user/me')
@@ -147,6 +168,7 @@ export default function DashboardPage() {
                     <th className="px-6 py-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Take Profit</th>
                     <th className="px-6 py-4 text-xs font-medium text-gray-400 uppercase tracking-wider">R:R</th>
                     <th className="px-6 py-4 text-xs font-medium text-gray-400 uppercase tracking-wider">TF</th>
+                    <th className="px-3 py-4 text-xs font-medium text-gray-400 uppercase tracking-wider"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-800/50">
@@ -184,6 +206,23 @@ export default function DashboardPage() {
                         <span className="text-xs px-2 py-1 rounded bg-gray-800 text-gray-400 font-mono">
                           {signal.timeframe}
                         </span>
+                      </td>
+                      <td className="px-3 py-4">
+                        <button
+                          onClick={() => handleShare(signal)}
+                          title="Copy shareable link"
+                          className="p-1.5 rounded text-gray-500 hover:text-emerald-400 hover:bg-gray-800 transition-all"
+                        >
+                          {copiedAsset === signal.asset ? (
+                            <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                            </svg>
+                          )}
+                        </button>
                       </td>
                     </tr>
                   ))}
