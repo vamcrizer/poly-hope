@@ -162,6 +162,26 @@ export function getLatestSignals(): Signal[] {
   `).all() as Signal[];
 }
 
+export function getSignalsHistory(params: {
+  asset?: string;
+  direction?: string;
+  limit?: number;
+  offset?: number;
+}): { signals: Signal[]; total: number } {
+  const { asset, direction, limit = 50, offset = 0 } = params;
+  const conditions: string[] = [];
+  const args: (string | number)[] = [];
+
+  if (asset && asset !== 'ALL') { conditions.push('asset = ?'); args.push(asset.toUpperCase()); }
+  if (direction && direction !== 'ALL') { conditions.push('direction = ?'); args.push(direction.toUpperCase()); }
+
+  const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+  const totalRow = db.prepare(`SELECT COUNT(*) AS cnt FROM signals_cache ${where}`).get(...args) as { cnt: number };
+  const signals = db.prepare(`SELECT * FROM signals_cache ${where} ORDER BY generated_at DESC LIMIT ? OFFSET ?`).all(...args, limit, offset) as Signal[];
+
+  return { signals, total: totalRow.cnt };
+}
+
 export function insertSignal(signal: {
   asset: string;
   direction: string;

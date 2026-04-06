@@ -1,24 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
-import { getSubscription, getLatestSignals } from '@/lib/db';
+import { getSubscription, getSignalsHistory } from '@/lib/db';
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
   const session = await getSession(request);
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const subscription = getSubscription(session.userId);
-  if (!subscription || subscription.status !== 'active') {
+  const sub = getSubscription(session.userId);
+  if (!sub || sub.status !== 'active') {
     return NextResponse.json({ error: 'Active subscription required' }, { status: 403 });
   }
 
-  const signals = getLatestSignals();
+  const { searchParams } = new URL(request.url);
+  const asset = searchParams.get('asset') ?? 'ALL';
+  const direction = searchParams.get('direction') ?? 'ALL';
+  const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10));
+  const limit = 25;
+  const offset = (page - 1) * limit;
 
-  const today = new Date().toISOString().split('T')[0];
-  const history = signals.length > 0
-    ? [{ date: today, signals }]
-    : [];
+  const { signals, total } = getSignalsHistory({ asset, direction, limit, offset });
 
-  return NextResponse.json({ history });
+  return NextResponse.json({
+    signals,
+    total,
+    page,
+    pages: Math.ceil(total / limit),
+  });
 }

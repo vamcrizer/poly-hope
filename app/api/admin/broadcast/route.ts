@@ -24,14 +24,16 @@ export async function POST(request: NextRequest) {
 
   // Get all users with telegram connected
   const usersWithTelegram = db.prepare(`
-    SELECT u.id, u.email, us.telegram_chat_id, us.email_alerts_enabled, COALESCE(us.min_confidence, 0) AS min_confidence
+    SELECT u.id, u.email, us.telegram_chat_id, us.email_alerts_enabled,
+      COALESCE(us.min_confidence, 0) AS min_confidence,
+      COALESCE(us.alert_assets, 'BTC,ETH,SOL,XRP,DOGE') AS alert_assets
     FROM users u
     JOIN user_settings us ON us.user_id = u.id
     JOIN subscriptions s ON s.user_id = u.id
     WHERE us.telegram_chat_id IS NOT NULL
     AND s.status = 'active'
     AND (us.email_alerts_enabled IS NULL OR us.email_alerts_enabled = 1)
-  `).all() as Array<{ id: number; email: string; telegram_chat_id: string; email_alerts_enabled: number; min_confidence: number }>;
+  `).all() as Array<{ id: number; email: string; telegram_chat_id: string; email_alerts_enabled: number; min_confidence: number; alert_assets: string }>;
 
   let sent = 0;
   let errors = 0;
@@ -39,10 +41,10 @@ export async function POST(request: NextRequest) {
   await Promise.allSettled(
     usersWithTelegram.map(async (user) => {
       try {
-        // Apply user's minimum confidence filter
-        const filtered = user.min_confidence > 0
-          ? signals.filter((s) => s.confidence >= user.min_confidence)
-          : signals;
+        const allowedAssets = user.alert_assets.split(',').map((a) => a.trim().toUpperCase());
+        // Apply asset filter and minimum confidence filter
+        let filtered = signals.filter((s) => allowedAssets.includes(s.asset.toUpperCase()));
+        if (user.min_confidence > 0) filtered = filtered.filter((s) => s.confidence >= user.min_confidence);
         if (filtered.length === 0) return;
         await sendSignalsDigest(user.telegram_chat_id, filtered);
         sent++;
