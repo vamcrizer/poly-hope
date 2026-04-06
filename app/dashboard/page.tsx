@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatConfidence, formatPrice, getDirectionBg, calcRiskReward, timeAgo } from '@/lib/utils';
+import { OnboardingChecklist } from '@/components/OnboardingChecklist';
 import type { Signal } from '@/types';
 
 export default function DashboardPage() {
@@ -13,6 +14,9 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [needsUpgrade, setNeedsUpgrade] = useState(false);
   const [copiedAsset, setCopiedAsset] = useState<string | null>(null);
+  const [hasTelegram, setHasTelegram] = useState(false);
+  const [hasApiKey, setHasApiKey] = useState(false);
+  const [checklistDismissed, setChecklistDismissed] = useState(false);
 
   function buildShareUrl(signal: Signal): string {
     const base = typeof window !== 'undefined' ? window.location.origin : 'https://polymarketsignals.com';
@@ -45,6 +49,19 @@ export default function DashboardPage() {
         // auth redirect only — layout handles user display
       })
       .catch(() => router.push('/login'));
+
+    // Load checklist data in parallel
+    fetch('/api/user/telegram')
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => { if (d?.telegram_chat_id) setHasTelegram(true); })
+      .catch(() => {});
+    fetch('/api/user/api-key')
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => { if (d?.key) setHasApiKey(true); })
+      .catch(() => {});
+
+    const dismissed = sessionStorage.getItem('checklist_dismissed');
+    if (dismissed) setChecklistDismissed(true);
   }, [router]);
 
   useEffect(() => {
@@ -66,8 +83,23 @@ export default function DashboardPage() {
       });
   }, []);
 
+  function handleChecklistDismiss() {
+    setChecklistDismissed(true);
+    sessionStorage.setItem('checklist_dismissed', '1');
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Onboarding checklist */}
+      {!loading && !needsUpgrade && !checklistDismissed && (
+        <OnboardingChecklist
+          hasTelegram={hasTelegram}
+          hasApiKey={hasApiKey}
+          hasViewedSignals={signals.length > 0}
+          onDismiss={handleChecklistDismiss}
+        />
+      )}
+
       {/* Upgrade banner */}
       {needsUpgrade && (
         <div className="mb-8 rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-6">
