@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { TrustBadges } from '@/components/TrustBadges';
 
 const plans = [
   {
@@ -26,6 +27,7 @@ const plans = [
     cta: 'Start Free Trial',
     href: '/signup',
     highlighted: false,
+    paid: true,
   },
   {
     name: 'Pro',
@@ -51,6 +53,7 @@ const plans = [
     href: '/signup',
     highlighted: true,
     badge: 'Most Popular',
+    paid: true,
   },
   {
     name: 'API',
@@ -75,6 +78,7 @@ const plans = [
     cta: 'Start Free Trial',
     href: '/signup',
     highlighted: false,
+    paid: true,
   },
 ];
 
@@ -155,9 +159,30 @@ export default function PricingPage() {
             <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4 tracking-tight">
               Simple, transparent pricing
             </h1>
-            <p className="text-gray-400 text-lg max-w-xl mx-auto">
+            <p className="text-gray-400 text-lg max-w-xl mx-auto mb-10">
               No hidden fees. No lock-in contracts. Start free, upgrade when you&apos;re ready.
             </p>
+            {/* Trust badges */}
+            <TrustBadges />
+          </div>
+        </section>
+
+        {/* Bloomberg comparison callout */}
+        <section className="pb-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-center gap-3 bg-gray-900/60 border border-gray-800 rounded-xl px-6 py-4 text-center max-w-3xl mx-auto">
+              <svg className="w-5 h-5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+              </svg>
+              <p className="text-gray-300 text-sm">
+                <span className="text-white font-semibold">vs. Bloomberg Terminal:</span>{' '}
+                comparable market-data intelligence for{' '}
+                <span className="text-emerald-400 font-semibold">$19–$99/mo</span>{' '}
+                instead of{' '}
+                <span className="text-gray-500 line-through">$1,000+/mo</span>{' '}
+                — and ours is built specifically for Polymarket crypto prediction markets.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -187,13 +212,23 @@ export default function PricingPage() {
                     <p className="text-gray-500 text-sm">{plan.description}</p>
                   </div>
 
-                  <div className="mb-7">
+                  <div className="mb-4">
                     <div className="flex items-baseline gap-1">
                       <span className="text-5xl font-bold text-white">{plan.price}</span>
                       <span className="text-gray-500 text-sm">{plan.period}</span>
                     </div>
                     <p className="text-xs text-gray-600 mt-1">Billed monthly. Cancel anytime.</p>
                   </div>
+
+                  {/* 7-day money back guarantee badge */}
+                  {plan.paid && (
+                    <div className="flex items-center gap-1.5 mb-5 text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-1.5 w-fit">
+                      <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                      7-day money-back guarantee
+                    </div>
+                  )}
 
                   <Link
                     href={plan.href}
