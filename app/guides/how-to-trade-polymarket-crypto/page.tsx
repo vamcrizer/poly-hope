@@ -12,9 +12,21 @@ export const metadata: Metadata = {
   },
 };
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'How to Trade Polymarket Crypto Prediction Markets',
+  description: 'Step-by-step guide to trading crypto prediction markets on Polymarket using RSI, MACD, and ATR signals.',
+  author: { '@type': 'Organization', name: 'Polymarket Signals' },
+  publisher: { '@type': 'Organization', name: 'Polymarket Signals', logo: { '@type': 'ImageObject', url: 'https://polymarketsignals.com/icon-192.png' } },
+  datePublished: '2026-04-06',
+  dateModified: '2026-04-06',
+};
+
 export default function GuidePolymarketCryptoPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Navbar />
 
       <main className="flex-1 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
