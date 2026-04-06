@@ -68,6 +68,26 @@ export async function GET(request: NextRequest) {
     }
 
     const signals = getLatestSignals();
+    const { searchParams } = new URL(request.url);
+    const format = searchParams.get('format') ?? 'json';
+    const rlHeaders = getRateLimitHeaders(rateLimitResult);
+
+    // CSV format support
+    if (format === 'csv' || request.headers.get('Accept') === 'text/csv') {
+      const header = 'asset,direction,confidence,entry_price,stop_loss,take_profit,timeframe,generated_at';
+      const rows = signals.map((s) =>
+        [s.asset, s.direction, s.confidence, s.entry_price, s.stop_loss, s.take_profit, s.timeframe, s.generated_at].join(',')
+      );
+      const csv = [header, ...rows].join('\n');
+      const res = new NextResponse(csv, {
+        headers: {
+          'Content-Type': 'text/csv; charset=utf-8',
+          'Content-Disposition': `attachment; filename="signals-${new Date().toISOString().slice(0, 10)}.csv"`,
+          ...rlHeaders,
+        },
+      });
+      return res;
+    }
 
     const response = NextResponse.json({
       signals,
@@ -76,7 +96,6 @@ export async function GET(request: NextRequest) {
     });
 
     // Add rate limit headers to successful response
-    const rlHeaders = getRateLimitHeaders(rateLimitResult);
     Object.entries(rlHeaders).forEach(([k, v]) => response.headers.set(k, v));
 
     return response;
