@@ -30,6 +30,13 @@ const guides = [
     readTime: '7 min read',
     tag: 'Technical Analysis',
   },
+  {
+    href: '/guides/what-is-atr-crypto',
+    title: 'What is ATR in Crypto Trading?',
+    desc: 'How Average True Range measures volatility, sets stop loss and take profit levels, and why 2.5:1 risk-reward works even with a low win rate.',
+    readTime: '6 min read',
+    tag: 'Technical Analysis',
+  },
 ];
 
 export default function GuidesPage() {

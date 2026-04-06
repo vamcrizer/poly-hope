@@ -16,5 +16,19 @@ export async function GET(request: NextRequest) {
   }
 
   const leads = getNewsletterLeads();
+
+  const format = new URL(request.url).searchParams.get('format');
+  if (format === 'csv') {
+    const header = 'email,source,created_at';
+    const rows = leads.map((l) => `${l.email},${l.source},${l.created_at}`);
+    const csv = [header, ...rows].join('\n');
+    return new NextResponse(csv, {
+      headers: {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': `attachment; filename="newsletter-leads-${new Date().toISOString().slice(0, 10)}.csv"`,
+      },
+    });
+  }
+
   return NextResponse.json({ leads, total: leads.length });
 }

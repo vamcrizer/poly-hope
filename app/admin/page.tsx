@@ -75,6 +75,8 @@ export default function AdminPage() {
 
   const [runningSignals, setRunningSignals] = useState(false);
   const [runSignalsResult, setRunSignalsResult] = useState<string | null>(null);
+  const [broadcasting, setBroadcasting] = useState(false);
+  const [broadcastResult, setBroadcastResult] = useState<string | null>(null);
 
   // Check if already authenticated via admin_session cookie
   useEffect(() => {
@@ -138,6 +140,29 @@ export default function AdminPage() {
       setRunSignalsResult('✗ Network error');
     } finally {
       setRunningSignals(false);
+    }
+  };
+
+  const handleBroadcast = async () => {
+    if (!confirm('Send Telegram broadcast to all connected users?')) return;
+    setBroadcasting(true);
+    setBroadcastResult(null);
+    try {
+      const secret = getLocalSecret();
+      const res = await fetch('/api/admin/broadcast', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${secret}` },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setBroadcastResult(`✓ Sent to ${data.sent} users (${data.errors} errors)`);
+      } else {
+        setBroadcastResult(`✗ Error: ${data.error || 'Unknown'}`);
+      }
+    } catch {
+      setBroadcastResult('✗ Network error');
+    } finally {
+      setBroadcasting(false);
     }
   };
 
@@ -240,6 +265,38 @@ export default function AdminPage() {
                 {runSignalsResult}
               </span>
             )}
+            <button
+              onClick={handleBroadcast}
+              disabled={broadcasting}
+              className="text-sm px-3 py-1.5 rounded-lg border border-blue-500/30 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors disabled:opacity-50"
+            >
+              {broadcasting ? 'Broadcasting...' : '📡 Broadcast'}
+            </button>
+            {broadcastResult && (
+              <span className={`text-xs ${broadcastResult.startsWith('✓') ? 'text-emerald-400' : 'text-red-400'}`}>
+                {broadcastResult}
+              </span>
+            )}
+            <a
+              href={`/api/admin/leads?format=csv&auth=${getLocalSecret()}`}
+              className="text-sm px-3 py-1.5 rounded-lg border border-gray-700 bg-gray-800 text-gray-400 hover:text-white transition-colors"
+              onClick={(e) => {
+                // Inject auth header not possible via anchor — use fetch instead
+                e.preventDefault();
+                const secret = getLocalSecret();
+                fetch(`/api/admin/leads?format=csv`, { headers: { Authorization: `Bearer ${secret}` } })
+                  .then((r) => r.blob())
+                  .then((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `newsletter-leads-${new Date().toISOString().slice(0,10)}.csv`;
+                    a.click();
+                  });
+              }}
+            >
+              ⬇ Leads CSV
+            </a>
             <button
               onClick={fetchStats}
               disabled={statsLoading}
