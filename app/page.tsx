@@ -3,6 +3,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { TestimonialCard } from '@/components/TestimonialCard';
+import { LiveSignalTicker } from '@/components/LiveSignalTicker';
 
 const stats = [
   { value: '2.5:1', label: 'Avg Risk:Reward Ratio' },
@@ -174,6 +175,11 @@ export default function LandingPage() {
           <p className="mt-5 text-xs text-gray-600">
             No credit card required · 7-day free trial · Cancel anytime
           </p>
+
+          {/* Live signal ticker */}
+          <div className="mt-10 max-w-sm mx-auto w-full">
+            <LiveSignalTicker />
+          </div>
         </div>
       </section>
 
