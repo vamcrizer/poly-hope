@@ -27,6 +27,8 @@ export default function SettingsPage() {
   const [testingSlack, setTestingSlack] = useState(false);
   const [slackTestResult, setSlackTestResult] = useState<boolean | null>(null);
   const [canUseSlack, setCanUseSlack] = useState(false);
+  const [testingEmail, setTestingEmail] = useState(false);
+  const [emailTestResult, setEmailTestResult] = useState<boolean | null>(null);
   const [discordUrl, setDiscordUrl] = useState('');
   const [savedDiscordUrl, setSavedDiscordUrl] = useState<string | null>(null);
   const [savingDiscord, setSavingDiscord] = useState(false);
@@ -135,6 +137,17 @@ export default function SettingsPage() {
       setSlackTestResult(data.success === true);
     } catch { setSlackTestResult(false); }
     finally { setTestingSlack(false); }
+  }
+
+  async function handleTestEmail() {
+    setTestingEmail(true);
+    setEmailTestResult(null);
+    try {
+      const res = await fetch('/api/user/email/test', { method: 'POST' });
+      const data = await res.json();
+      setEmailTestResult(data.success === true);
+    } catch { setEmailTestResult(false); }
+    finally { setTestingEmail(false); }
   }
 
   async function handleSaveDiscord(e: React.FormEvent) {
@@ -462,6 +475,24 @@ export default function SettingsPage() {
           When enabled, you&apos;ll receive the daily signals digest at 8AM UTC.
           {savingEmail && <span className="ml-2 text-gray-600">Saving…</span>}
         </p>
+
+        {emailAlertsEnabled && (
+          <div className="flex items-center gap-3 mt-3">
+            <button
+              type="button"
+              onClick={handleTestEmail}
+              disabled={testingEmail}
+              className="px-3 py-1.5 rounded-lg border border-gray-700 bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs transition-colors disabled:opacity-50"
+            >
+              {testingEmail ? 'Sending...' : 'Send test email'}
+            </button>
+            {emailTestResult !== null && (
+              <span className={`text-xs ${emailTestResult ? 'text-emerald-400' : 'text-red-400'}`}>
+                {emailTestResult ? '✓ Email sent — check your inbox' : '✗ Failed to send'}
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Asset selection */}
         <div className="mt-5 pt-5 border-t border-gray-800">

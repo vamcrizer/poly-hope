@@ -23,6 +23,13 @@ const guides = [
     readTime: '6 min read',
     tag: 'Technical Analysis',
   },
+  {
+    href: '/guides/what-is-macd-crypto',
+    title: 'What is MACD in Crypto Trading?',
+    desc: 'Understand MACD crossovers, the histogram, bullish/bearish divergence, and how MACD confirms RSI signals to boost confidence scores.',
+    readTime: '7 min read',
+    tag: 'Technical Analysis',
+  },
 ];
 
 export default function GuidesPage() {
