@@ -64,6 +64,9 @@ export default function AdminPage() {
   const [statsLoading, setStatsLoading] = useState(false);
   const [statsError, setStatsError] = useState('');
 
+  const [runningSignals, setRunningSignals] = useState(false);
+  const [runSignalsResult, setRunSignalsResult] = useState<string | null>(null);
+
   // Check if already authenticated via admin_session cookie
   useEffect(() => {
     fetch('/api/admin/stats', {
@@ -104,6 +107,30 @@ export default function AdminPage() {
       fetchStats();
     }
   }, [authenticated, fetchStats]);
+
+  const handleRunSignals = async () => {
+    if (!confirm('Run signal generation now? This will fetch live data from Binance.')) return;
+    setRunningSignals(true);
+    setRunSignalsResult(null);
+    try {
+      const secret = getLocalSecret();
+      const cronSecret = secret; // Use admin secret as cron secret fallback
+      const res = await fetch('/api/cron/signals', {
+        headers: { Authorization: `Bearer ${cronSecret}` },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setRunSignalsResult(`✓ Generated ${data.signals_generated} signals`);
+        fetchStats();
+      } else {
+        setRunSignalsResult(`✗ Error: ${data.error || 'Unknown error'}`);
+      }
+    } catch {
+      setRunSignalsResult('✗ Network error');
+    } finally {
+      setRunningSignals(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -192,6 +219,18 @@ export default function AdminPage() {
             </span>
           </div>
           <div className="flex items-center gap-4">
+            <button
+              onClick={handleRunSignals}
+              disabled={runningSignals}
+              className="text-sm px-3 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors disabled:opacity-50"
+            >
+              {runningSignals ? 'Running...' : '⚡ Run Signals'}
+            </button>
+            {runSignalsResult && (
+              <span className={`text-xs ${runSignalsResult.startsWith('✓') ? 'text-emerald-400' : 'text-red-400'}`}>
+                {runSignalsResult}
+              </span>
+            )}
             <button
               onClick={fetchStats}
               disabled={statsLoading}
