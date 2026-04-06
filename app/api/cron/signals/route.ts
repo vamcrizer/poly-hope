@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { deliverToAllSubscribers } from '@/lib/webhook-delivery';
+import { sendSlackSignals } from '@/lib/slack';
+import db from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -240,13 +242,33 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
   }
 
-  // Deliver to webhook subscribers (fire-and-forget, non-blocking)
+  // Deliver to webhook + Slack subscribers (fire-and-forget, non-blocking)
   if (generated.length > 0) {
     const now = new Date().toISOString();
     const signalsWithTimestamp = generated.map((s) => ({ ...s, generated_at: now }));
+
+    // Webhook delivery
     deliverToAllSubscribers(signalsWithTimestamp).catch((err) => {
       console.error('[cron/signals] webhook delivery error:', err);
     });
+
+    // Slack delivery — notify all Pro/API subscribers with Slack configured
+    try {
+      const slackUsers = db.prepare(`
+        SELECT us.slack_webhook_url
+        FROM user_settings us
+        JOIN subscriptions s ON s.user_id = us.user_id
+        WHERE us.slack_webhook_url IS NOT NULL
+          AND s.status = 'active'
+          AND s.plan IN ('pro', 'api')
+      `).all() as { slack_webhook_url: string }[];
+
+      for (const row of slackUsers) {
+        sendSlackSignals(row.slack_webhook_url, generated).catch(() => {});
+      }
+    } catch (err) {
+      console.error('[cron/signals] slack delivery error:', err);
+    }
   }
 
   return NextResponse.json({
