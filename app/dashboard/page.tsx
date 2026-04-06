@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatConfidence, formatPrice, getDirectionBg, calcRiskReward, timeAgo } from '@/lib/utils';
 import { OnboardingChecklist } from '@/components/OnboardingChecklist';
+import { MarketBiasBadge } from '@/components/MarketBiasBadge';
 import type { Signal } from '@/types';
 
 export default function DashboardPage() {
@@ -129,13 +130,23 @@ export default function DashboardPage() {
               Updated {timeAgo(generatedAt)} · {new Date(generatedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })} UTC
             </p>
           )}
+          {signals.length > 0 && (
+            <div className="mt-2">
+              <MarketBiasBadge signals={signals} />
+            </div>
+          )}
         </div>
-        <a
-          href="/backtest"
-          className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
-        >
-          View Backtest →
-        </a>
+        <div className="flex items-center gap-4">
+          <a href="/api/signals/export" className="hidden sm:block text-sm text-gray-500 hover:text-gray-300 transition-colors">
+            Export CSV
+          </a>
+          <a
+            href="/backtest"
+            className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+          >
+            View Backtest →
+          </a>
+        </div>
       </div>
 
       {/* Error */}
