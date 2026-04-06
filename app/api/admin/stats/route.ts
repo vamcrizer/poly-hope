@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminStats } from '@/lib/db';
+import { getAdminStats, getSignupEventStats } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +17,8 @@ export async function GET(request: NextRequest) {
 
   try {
     const stats = getAdminStats();
-    return NextResponse.json(stats);
+    const utm_stats = getSignupEventStats();
+    return NextResponse.json({ ...stats, utm_stats });
   } catch (err) {
     console.error('[admin/stats] error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

@@ -3,6 +3,13 @@
 import { useEffect, useState, useCallback } from 'react';
 import type { Signal } from '@/types';
 
+interface UtmRow {
+  source: string | null;
+  medium: string | null;
+  campaign: string | null;
+  count: number;
+}
+
 interface AdminStats {
   total_users: number;
   active_subscribers: number;
@@ -12,6 +19,7 @@ interface AdminStats {
   signals_by_asset: { asset: string; count: number }[];
   recent_users: { id: number; email: string; plan: string; status: string; created_at: string }[];
   recent_signals: Signal[];
+  utm_stats?: UtmRow[];
 }
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
@@ -353,6 +361,38 @@ export default function AdminPage() {
                       </td>
                     </tr>
                   )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
+
+        {/* UTM Analytics */}
+        {stats && stats.utm_stats && stats.utm_stats.length > 0 && (
+          <section>
+            <h2 className="text-lg font-semibold text-white mb-4">
+              Signup Sources
+              <span className="ml-2 text-sm font-normal text-gray-500">(UTM attribution)</span>
+            </h2>
+            <div className="rounded-xl border border-gray-800 overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-900/80">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Source</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Medium</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Campaign</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Signups</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-800/50">
+                  {stats.utm_stats.map((row, i) => (
+                    <tr key={i} className="bg-gray-900/30 hover:bg-gray-800/30 transition-colors">
+                      <td className="px-4 py-3 text-gray-200">{row.source ?? <span className="text-gray-600">direct</span>}</td>
+                      <td className="px-4 py-3 text-gray-400">{row.medium ?? '—'}</td>
+                      <td className="px-4 py-3 text-gray-400">{row.campaign ?? '—'}</td>
+                      <td className="px-4 py-3 text-white font-semibold">{row.count}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

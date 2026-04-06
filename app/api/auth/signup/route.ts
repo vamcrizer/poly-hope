@@ -5,6 +5,7 @@ import { signToken, setSessionCookie } from '@/lib/auth';
 import { applyReferral } from '@/lib/db-extras';
 import { sendWelcomeEmail } from '@/lib/email';
 import { checkSignupRateLimit } from '@/lib/rate-limit';
+import { recordSignupEvent } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -79,10 +80,19 @@ export async function POST(request: NextRequest) {
       status: 'inactive',
     });
 
-    // Log UTM params for analytics (non-blocking)
     const effectiveRefCode = bodyRefCode?.trim() || refCode?.trim() || null;
-    if (utmSource || utmMedium || utmCampaign) {
-      console.info(`[signup] UTM — source:${utmSource ?? ''} medium:${utmMedium ?? ''} campaign:${utmCampaign ?? ''} user:${user.id}`);
+
+    // Record signup event for UTM analytics
+    try {
+      recordSignupEvent({
+        userId: user.id,
+        utmSource: utmSource || undefined,
+        utmMedium: utmMedium || undefined,
+        utmCampaign: utmCampaign || undefined,
+        refCode: effectiveRefCode || undefined,
+      });
+    } catch {
+      // non-fatal
     }
 
     // Apply referral if a valid ref code was provided

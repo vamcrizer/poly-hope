@@ -298,6 +298,52 @@ db.exec(`
 `);
 
 db.exec(`
+  CREATE TABLE IF NOT EXISTS signup_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    utm_source TEXT,
+    utm_medium TEXT,
+    utm_campaign TEXT,
+    ref_code TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+  );
+`);
+
+export function recordSignupEvent(params: {
+  userId: number;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  refCode?: string;
+}): void {
+  db.prepare(`
+    INSERT INTO signup_events (user_id, utm_source, utm_medium, utm_campaign, ref_code)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(
+    params.userId,
+    params.utmSource ?? null,
+    params.utmMedium ?? null,
+    params.utmCampaign ?? null,
+    params.refCode ?? null,
+  );
+}
+
+export function getSignupEventStats(): {
+  source: string | null;
+  medium: string | null;
+  campaign: string | null;
+  count: number;
+}[] {
+  return db.prepare(`
+    SELECT utm_source AS source, utm_medium AS medium, utm_campaign AS campaign, COUNT(*) AS count
+    FROM signup_events
+    GROUP BY utm_source, utm_medium, utm_campaign
+    ORDER BY count DESC
+    LIMIT 50
+  `).all() as { source: string | null; medium: string | null; campaign: string | null; count: number }[];
+}
+
+db.exec(`
   CREATE TABLE IF NOT EXISTS newsletter_leads (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT UNIQUE NOT NULL,
