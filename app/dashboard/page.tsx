@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { formatConfidence, formatPrice, getDirectionBg, calcRiskReward, timeAgo } from '@/lib/utils';
 import { OnboardingChecklist } from '@/components/OnboardingChecklist';
 import { MarketBiasBadge } from '@/components/MarketBiasBadge';
+import { NextSignalCountdown } from '@/components/NextSignalCountdown';
 import type { Signal } from '@/types';
 
 export default function DashboardPage() {
@@ -130,6 +131,7 @@ export default function DashboardPage() {
               Updated {timeAgo(generatedAt)} · {new Date(generatedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })} UTC
             </p>
           )}
+          {!loading && !generatedAt && <NextSignalCountdown />}
           {signals.length > 0 && (
             <div className="mt-2">
               <MarketBiasBadge signals={signals} />
