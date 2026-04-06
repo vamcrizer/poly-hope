@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { deliverToAllSubscribers } from '@/lib/webhook-delivery';
 import { sendSlackSignals } from '@/lib/slack';
+import { sendSignalsEmail } from '@/lib/email';
 import db from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -268,6 +269,30 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       }
     } catch (err) {
       console.error('[cron/signals] slack delivery error:', err);
+    }
+
+    // Email digest — all active subscribers with email_alerts_enabled
+    try {
+      const emailUsers = db.prepare(`
+        SELECT u.email,
+          COALESCE(us.min_confidence, 0) AS min_confidence,
+          COALESCE(us.alert_assets, 'BTC,ETH,SOL,XRP,DOGE') AS alert_assets
+        FROM users u
+        JOIN subscriptions s ON s.user_id = u.id
+        LEFT JOIN user_settings us ON us.user_id = u.id
+        WHERE s.status = 'active'
+          AND (us.email_alerts_enabled IS NULL OR us.email_alerts_enabled = 1)
+      `).all() as { email: string; min_confidence: number; alert_assets: string }[];
+
+      for (const user of emailUsers) {
+        const allowed = user.alert_assets.split(',').map((a) => a.trim().toUpperCase());
+        let filtered = generated.filter((s) => allowed.includes(s.asset.toUpperCase()));
+        if (user.min_confidence > 0) filtered = filtered.filter((s) => s.confidence >= user.min_confidence);
+        if (filtered.length === 0) continue;
+        sendSignalsEmail(user.email, filtered as any).catch(() => {});
+      }
+    } catch (err) {
+      console.error('[cron/signals] email delivery error:', err);
     }
   }
 

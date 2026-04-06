@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { createUser, getUser, upsertSubscription } from '@/lib/db';
 import { signToken, setSessionCookie } from '@/lib/auth';
 import { applyReferral } from '@/lib/db-extras';
+import { sendWelcomeEmail } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
 
@@ -82,6 +83,9 @@ export async function POST(request: NextRequest) {
         console.warn('[signup] applyReferral error:', refErr);
       }
     }
+
+    // Send welcome email (non-blocking, best-effort)
+    sendWelcomeEmail(user.email).catch(() => {});
 
     // Sign JWT and set cookie
     const token = await signToken({ userId: user.id, email: user.email });
