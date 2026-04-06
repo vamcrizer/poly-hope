@@ -82,6 +82,18 @@ export default function AccountPage() {
     }
   };
 
+  const handleManageBilling = async () => {
+    setOpeningPortal(true);
+    const res = await fetch('/api/stripe/portal', { method: 'POST' });
+    const data = await res.json();
+    if (data.url) {
+      window.location.assign(data.url);
+    } else {
+      alert('Could not open billing portal. Please try again.');
+      setOpeningPortal(false);
+    }
+  };
+
   const handleUpgrade = async (plan: 'basic' | 'pro' | 'api') => {
     const res = await fetch('/api/stripe/checkout', {
       method: 'POST',
@@ -159,7 +171,14 @@ export default function AccountPage() {
                   </span>
                 </div>
               )}
-              <div className="pt-2">
+              <div className="pt-2 flex items-center gap-4">
+                <button
+                  onClick={handleManageBilling}
+                  disabled={openingPortal}
+                  className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors disabled:opacity-50"
+                >
+                  {openingPortal ? 'Opening...' : 'Manage billing & invoices →'}
+                </button>
                 <button
                   onClick={handleCancelSubscription}
                   disabled={cancelling}
