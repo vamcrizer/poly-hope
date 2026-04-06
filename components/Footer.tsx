@@ -4,7 +4,7 @@ export function Footer() {
   return (
     <footer className="border-t border-gray-800 bg-gray-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10 md:grid-cols-[2fr_1fr_1fr]">
           {/* Brand */}
           <div className="md:col-span-2">
             <Link href="/" className="flex items-center gap-2 text-white font-bold text-lg mb-3">
@@ -36,63 +36,28 @@ export function Footer() {
               Product
             </h3>
             <ul className="space-y-2.5">
-              <li>
-                <Link
-                  href="/#features"
-                  className="text-sm text-gray-500 hover:text-white transition-colors"
-                >
-                  Features
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/pricing"
-                  className="text-sm text-gray-500 hover:text-white transition-colors"
-                >
-                  Pricing
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/dashboard"
-                  className="text-sm text-gray-500 hover:text-white transition-colors"
-                >
-                  Dashboard
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/signup"
-                  className="text-sm text-gray-500 hover:text-white transition-colors"
-                >
-                  Start Free Trial
-                </Link>
-              </li>
+              <li><Link href="/#features" className="text-sm text-gray-500 hover:text-white transition-colors">Features</Link></li>
+              <li><Link href="/pricing" className="text-sm text-gray-500 hover:text-white transition-colors">Pricing</Link></li>
+              <li><Link href="/signals" className="text-sm text-gray-500 hover:text-white transition-colors">Signals</Link></li>
+              <li><Link href="/preview" className="text-sm text-gray-500 hover:text-white transition-colors">Live Preview</Link></li>
+              <li><Link href="/compare" className="text-sm text-gray-500 hover:text-white transition-colors">Compare</Link></li>
+              <li><Link href="/signup" className="text-sm text-gray-500 hover:text-white transition-colors">Start Free Trial</Link></li>
             </ul>
           </div>
 
-          {/* Legal */}
+          {/* Resources */}
           <div>
             <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
-              Legal
+              Resources
             </h3>
             <ul className="space-y-2.5">
-              <li>
-                <Link
-                  href="/privacy"
-                  className="text-sm text-gray-500 hover:text-white transition-colors"
-                >
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/terms"
-                  className="text-sm text-gray-500 hover:text-white transition-colors"
-                >
-                  Terms of Service
-                </Link>
-              </li>
+              <li><Link href="/docs" className="text-sm text-gray-500 hover:text-white transition-colors">API Docs</Link></li>
+              <li><Link href="/faq" className="text-sm text-gray-500 hover:text-white transition-colors">FAQ</Link></li>
+              <li><Link href="/performance" className="text-sm text-gray-500 hover:text-white transition-colors">Performance</Link></li>
+              <li><Link href="/changelog" className="text-sm text-gray-500 hover:text-white transition-colors">Changelog</Link></li>
+              <li><Link href="/status" className="text-sm text-gray-500 hover:text-white transition-colors">System Status</Link></li>
+              <li><Link href="/privacy" className="text-sm text-gray-500 hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="text-sm text-gray-500 hover:text-white transition-colors">Terms of Service</Link></li>
             </ul>
           </div>
         </div>

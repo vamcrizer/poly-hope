@@ -69,6 +69,29 @@ const SIGNUP_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 const SIGNUP_MAX = 5;
 const signupStore = new Map<string, RateLimitEntry>();
 
+// ── Login rate limiter (per IP, 10 attempts per 15 min) ──────────────────────
+
+const LOGIN_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+const LOGIN_MAX = 10;
+const loginStore = new Map<string, RateLimitEntry>();
+
+export function checkLoginRateLimit(ip: string): RateLimitResult {
+  const now = Date.now();
+  const entry = loginStore.get(ip);
+
+  if (!entry || now - entry.windowStart > LOGIN_WINDOW_MS) {
+    loginStore.set(ip, { count: 1, windowStart: now });
+    return { allowed: true, remaining: LOGIN_MAX - 1, limit: LOGIN_MAX, resetAt: now + LOGIN_WINDOW_MS };
+  }
+
+  if (entry.count >= LOGIN_MAX) {
+    return { allowed: false, remaining: 0, limit: LOGIN_MAX, resetAt: entry.windowStart + LOGIN_WINDOW_MS };
+  }
+
+  entry.count += 1;
+  return { allowed: true, remaining: LOGIN_MAX - entry.count, limit: LOGIN_MAX, resetAt: entry.windowStart + LOGIN_WINDOW_MS };
+}
+
 export function checkSignupRateLimit(ip: string): RateLimitResult {
   const now = Date.now();
   const entry = signupStore.get(ip);
