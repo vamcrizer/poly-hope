@@ -22,6 +22,7 @@ function DashboardContent() {
   const [hasApiKey, setHasApiKey] = useState(false);
   const [checklistDismissed, setChecklistDismissed] = useState(false);
   const [minConfidence, setMinConfidence] = useState(0);
+  const [directionFilter, setDirectionFilter] = useState<'ALL' | 'LONG' | 'SHORT'>('ALL');
 
   function buildShareUrl(signal: Signal): string {
     const base = typeof window !== 'undefined' ? window.location.origin : 'https://polymarketsignals.com';
@@ -186,28 +187,48 @@ function DashboardContent() {
         </div>
       )}
 
-      {/* Confidence filter */}
-      {!loading && !needsUpgrade && signals.filter(s => s.confidence >= minConfidence).length > 0 && (
-        <div className="flex items-center gap-3 mb-4 text-sm">
-          <span className="text-gray-500 text-xs">Min confidence:</span>
-          {[0, 0.5, 0.6, 0.7, 0.8].map((v) => (
-            <button
-              key={v}
-              onClick={() => setMinConfidence(v)}
-              className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
-                minConfidence === v
-                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                  : 'bg-gray-800 text-gray-500 border border-gray-700 hover:text-gray-300'
-              }`}
-            >
-              {v === 0 ? 'All' : `${v * 100}%+`}
-            </button>
-          ))}
+      {/* Filters */}
+      {!loading && !needsUpgrade && signals.length > 0 && (
+        <div className="flex flex-wrap items-center gap-4 mb-4">
+          <div className="flex items-center gap-2">
+            <span className="text-gray-500 text-xs">Direction:</span>
+            {(['ALL', 'LONG', 'SHORT'] as const).map((d) => (
+              <button
+                key={d}
+                onClick={() => setDirectionFilter(d)}
+                className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                  directionFilter === d
+                    ? d === 'LONG' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                      : d === 'SHORT' ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                      : 'bg-gray-700 text-gray-300 border border-gray-600'
+                    : 'bg-gray-800 text-gray-500 border border-gray-700 hover:text-gray-300'
+                }`}
+              >
+                {d}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-gray-500 text-xs">Min confidence:</span>
+            {[0, 0.5, 0.6, 0.7, 0.8].map((v) => (
+              <button
+                key={v}
+                onClick={() => setMinConfidence(v)}
+                className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                  minConfidence === v
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                    : 'bg-gray-800 text-gray-500 border border-gray-700 hover:text-gray-300'
+                }`}
+              >
+                {v === 0 ? 'All' : `${v * 100}%+`}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
       {/* Desktop table */}
-      {!loading && !needsUpgrade && signals.filter(s => s.confidence >= minConfidence).length > 0 && (
+      {!loading && !needsUpgrade && signals.filter(s => s.confidence >= minConfidence && (directionFilter === 'ALL' || s.direction === directionFilter)).length > 0 && (
         <>
           <div className="hidden md:block rounded-xl border border-gray-800 overflow-hidden">
             <table className="w-full">
@@ -225,7 +246,7 @@ function DashboardContent() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800/50">
-                {signals.filter(s => s.confidence >= minConfidence).map((signal) => (
+                {signals.filter(s => s.confidence >= minConfidence && (directionFilter === 'ALL' || s.direction === directionFilter)).map((signal) => (
                   <tr key={signal.asset} className="bg-gray-900/40 hover:bg-gray-800/40 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -285,7 +306,7 @@ function DashboardContent() {
 
           {/* Mobile cards */}
           <div className="md:hidden space-y-4">
-            {signals.filter(s => s.confidence >= minConfidence).map((signal) => (
+            {signals.filter(s => s.confidence >= minConfidence && (directionFilter === 'ALL' || s.direction === directionFilter)).map((signal) => (
               <div key={signal.asset} className="rounded-xl border border-gray-800 bg-gray-900/60 p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
