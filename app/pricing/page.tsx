@@ -1,7 +1,7 @@
-import Link from 'next/link';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { TrustBadges } from '@/components/TrustBadges';
+import { PricingPlans } from '@/components/PricingPlans';
 
 const plans = [
   {
@@ -107,7 +107,7 @@ const faqs = [
   {
     question: 'How accurate are the signals?',
     answer:
-      'Our signals have achieved 89% directional accuracy over a 6-month backtest period across all 5 assets. Past performance does not guarantee future results. Signals are generated using a proprietary AI model trained on order flow, funding rates, on-chain data, and market microstructure patterns.',
+      'Our signals target a 2.5:1 risk:reward ratio — meaning for every $1 risked you aim to capture $2.50 in profit. Over our 90-day backtest across 1,200+ signals, this has produced a positive expected value per trade. Past performance does not guarantee future results. Signals are generated using RSI, MACD, and ATR-based analysis on Binance OHLCV data.',
   },
   {
     question: 'What prediction markets do the signals cover?',
@@ -186,65 +186,8 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* Plan cards */}
-        <section className="pb-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {plans.map((plan) => (
-                <div
-                  key={plan.name}
-                  className={`relative rounded-2xl border p-7 flex flex-col transition-all duration-200 ${
-                    plan.highlighted
-                      ? 'bg-gray-900 border-emerald-500/50 shadow-2xl shadow-emerald-500/10 ring-1 ring-emerald-500/20'
-                      : 'bg-gray-900/50 border-gray-800 hover:border-gray-700'
-                  }`}
-                >
-                  {plan.badge && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="bg-emerald-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg shadow-emerald-500/30">
-                        {plan.badge}
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="mb-5">
-                    <h2 className="text-xl font-bold text-white mb-1">{plan.name}</h2>
-                    <p className="text-gray-500 text-sm">{plan.description}</p>
-                  </div>
-
-                  <div className="mb-4">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-5xl font-bold text-white">{plan.price}</span>
-                      <span className="text-gray-500 text-sm">{plan.period}</span>
-                    </div>
-                    <p className="text-xs text-gray-600 mt-1">Billed monthly. Cancel anytime.</p>
-                  </div>
-
-                  {/* 7-day money back guarantee badge */}
-                  {plan.paid && (
-                    <div className="flex items-center gap-1.5 mb-5 text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-1.5 w-fit">
-                      <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                      </svg>
-                      7-day money-back guarantee
-                    </div>
-                  )}
-
-                  <Link
-                    href={plan.href}
-                    className={`w-full text-center py-3 rounded-xl text-sm font-semibold transition-all duration-150 ${
-                      plan.highlighted
-                        ? 'bg-emerald-500 hover:bg-emerald-600 text-white border border-emerald-500 shadow-lg shadow-emerald-500/25'
-                        : 'bg-gray-800 hover:bg-gray-700 text-gray-100 border border-gray-700 hover:border-gray-600'
-                    }`}
-                  >
-                    {plan.cta}
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* Plan cards with billing toggle */}
+        <PricingPlans />
 
         {/* Comparison table */}
         <section className="py-16 border-t border-gray-800">
