@@ -37,6 +37,13 @@ const guides = [
     readTime: '6 min read',
     tag: 'Technical Analysis',
   },
+  {
+    href: '/guides/what-is-bollinger-bands-crypto',
+    title: 'What are Bollinger Bands in Crypto Trading?',
+    desc: 'Bollinger Band position, squeezes, and breakouts explained. How BB position confirms RSI signals and contributes to the confidence score.',
+    readTime: '6 min read',
+    tag: 'Technical Analysis',
+  },
 ];
 
 export default function GuidesPage() {
