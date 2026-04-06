@@ -19,6 +19,7 @@ export default function DashboardPage() {
   const [hasTelegram, setHasTelegram] = useState(false);
   const [hasApiKey, setHasApiKey] = useState(false);
   const [checklistDismissed, setChecklistDismissed] = useState(false);
+  const [minConfidence, setMinConfidence] = useState(0);
 
   function buildShareUrl(signal: Signal): string {
     const base = typeof window !== 'undefined' ? window.location.origin : 'https://polymarketsignals.com';
@@ -167,8 +168,28 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* Confidence filter */}
+      {!loading && !needsUpgrade && signals.filter(s => s.confidence >= minConfidence).length > 0 && (
+        <div className="flex items-center gap-3 mb-4 text-sm">
+          <span className="text-gray-500 text-xs">Min confidence:</span>
+          {[0, 0.5, 0.6, 0.7, 0.8].map((v) => (
+            <button
+              key={v}
+              onClick={() => setMinConfidence(v)}
+              className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                minConfidence === v
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                  : 'bg-gray-800 text-gray-500 border border-gray-700 hover:text-gray-300'
+              }`}
+            >
+              {v === 0 ? 'All' : `${v * 100}%+`}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Desktop table */}
-      {!loading && !needsUpgrade && signals.length > 0 && (
+      {!loading && !needsUpgrade && signals.filter(s => s.confidence >= minConfidence).length > 0 && (
         <>
           <div className="hidden md:block rounded-xl border border-gray-800 overflow-hidden">
             <table className="w-full">
@@ -186,7 +207,7 @@ export default function DashboardPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800/50">
-                {signals.map((signal) => (
+                {signals.filter(s => s.confidence >= minConfidence).map((signal) => (
                   <tr key={signal.asset} className="bg-gray-900/40 hover:bg-gray-800/40 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -246,7 +267,7 @@ export default function DashboardPage() {
 
           {/* Mobile cards */}
           <div className="md:hidden space-y-4">
-            {signals.map((signal) => (
+            {signals.filter(s => s.confidence >= minConfidence).map((signal) => (
               <div key={signal.asset} className="rounded-xl border border-gray-800 bg-gray-900/60 p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
